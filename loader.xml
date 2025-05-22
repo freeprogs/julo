@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<site name="">
+  <urls file="" search="" replace="" />
+  <notice name="" one="" all="" />
+  <patterns>
+    <pattern start=""
+             left=""
+             right="" />
+    <pattern start=''
+             left=''
+             right='' />
+  </patterns>
+  <temp prefix="" suffix="" random="" />
+  <final prefix="" suffix="" />
+</site>

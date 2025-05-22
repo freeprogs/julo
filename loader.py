@@ -1,0 +1,482 @@
+#!/usr/bin/env python3
+
+"""Загрузчик файлов, управляемый файлом, содержащим
+маркированные ссылки.
+
+Все отмеченные маркером ссылки загружаются по очереди.
+Если файл по ссылке не докачан, то он сохраняется под своим
+временным именем. Если файл докачан, то он сохраняется после
+последнего из существующих в каталоге под следующим номером.
+Когда файл скачан, пользователь уведомляется всплывающим сообщением.
+"""
+
+# 15.11.2012
+
+import os
+import urllib.request
+import urllib.error
+import re
+import subprocess
+import hashlib
+import xml.etree.ElementTree
+import sys
+
+class ConfigFileHandler:
+    """Загружает данные из xml-файла."""
+    def __init__(self, fname):
+        """
+        fname      имя файла
+        
+        пример:
+        ConfigFileHandler('loader.xml')
+        """
+        self._fname = fname
+        self._dct = {}
+        
+    def load_config(self):
+        #дано    : 
+        #получить: из xml-файла данные загружены в словарь
+        """Загрузить данные из файла."""
+        root = xml.etree.ElementTree.parse(self._fname)
+        for child in root.iter():
+            tag = child.tag
+            att = child.attrib
+            if tag == 'site':
+                self._dct[tag] = att['name']
+            if tag == 'urls':
+                self._dct[tag] = (att['file'], att['search'],
+                                  att['replace'])
+            elif tag == 'notice':
+                self._dct[tag] = (att['name'], att['one'],
+                                  att['all'])
+            elif tag == 'patterns':
+                self._dct[tag] = []
+            elif tag == 'pattern':
+                self._dct['patterns'].append(
+                    (att['start'], att['left'], att['right']))
+            elif tag == 'temp':
+                self._dct[tag] = (att['prefix'], att['suffix'],
+                                  int(att['random']))
+            elif tag == 'final':
+                self._dct[tag] = (att['prefix'], att['suffix'])
+        
+    def getname(self):
+        #дано    : 
+        #получить: название сайта
+        """Имя сайта."""
+        return self._dct['site']
+        
+    def geturls(self):
+        #дано    : 
+        #получить: ссылки (файл, маркер, маркер замены)
+        """Ссылки (файл, маркер, маркер замены)."""
+        return self._dct['urls']
+        
+    def getnotice(self):
+        #дано    : 
+        #получить: уведомления (название, один, все)
+        """Уведомления (название, один, все)."""
+        return self._dct['notice']
+        
+    def getpatterns(self):
+        #дано    : 
+        #получить: список шаблонов [(начало, левый, правый), ...]
+        """Список шаблонов [(начало, левый, правый), ...]."""
+        return self._dct['patterns']
+        
+    def gettemp(self):
+        #дано    : 
+        #получить: временное имя (префикс, суффикс, число)
+        """Временное имя (префикс, суффикс, число)."""
+        return self._dct['temp']
+        
+    def getfinal(self):
+        #дано    : 
+        #получить: постоянное имя (префикс, суффикс)
+        """Постоянное имя (префикс, суффикс)."""
+        return self._dct['final']
+
+class FilesDownloader:
+    """Загрузчик файлов по файлу с маркированными ссылками."""
+    def __init__(self,
+                 urlsfname, marker, rmarker,
+                 notname, notmsg_load, notmsg_comp,
+                 patterns,
+                 tmppref, tmpsuf, tmphlen,
+                 nxtpref, nxtsuf):
+        """
+        urlsfname      файл с маркированными ссылками
+        marker         маркер в начале ссылки
+        rmarker        маркер замены
+        notifymsg      сообщение для уведомления
+        notname        название уведомителя
+        notmsg_load    сообщение для уведомления о загрузке
+        notmsg_comp    сообщение для уведомления о завершении
+        patterns       список с тройками шаблонов (в кортежах):
+                         - шаблон начала поиска
+                         - левый шаблон строки
+                         - правый шаблон строки
+        tmppref        префикс временного файла
+        tmpsuf         суффикс временного файла
+        tmphlen        длина последовательности временного файла
+        nxtpref        префикс постоянного файла
+        nxtsuf         суффикс постоянного файла
+        
+        пример:
+        FilesDownloader('urls', '*', '[',
+                        'partv', 'loaded', 'complete',
+                        [(r'Скачать', r'<a href=.', r'. class'),
+                         (r'Скачать', r'<a href=.', r'. class')]
+                        'tmp_', '.mp4', 8,
+                        't', '.mp4')
+        """
+        self._urlsfname = urlsfname
+        self._marker = marker
+        self._rmarker = rmarker
+        self._notname = notname
+        self._notmsg_load = notmsg_load
+        self._notmsg_comp = notmsg_comp
+        self._patterns = patterns
+        self._tmppref = tmppref
+        self._tmpsuf = tmpsuf
+        self._tmphlen = tmphlen
+        self._nxtpref = nxtpref
+        self._nxtsuf = nxtsuf
+        
+    def download_files(self):
+        #дано    : 
+        #получить: по ссылкам с маркером из файла загружены
+        #          файлы, загруженные ссылки отмечены другим
+        #          маркером
+        """Загрузить файлы по маркированным ссылкам из файла,
+        сохраняя их под временными или постоянными именами (в
+        зависимости от закачанности) и помечая загруженные
+        ссылки другим маркером."""
+        urlsfname = self._urlsfname
+        marker = self._marker
+        rmarker = self._rmarker
+        notname = self._notname
+        notmsg_load = self._notmsg_load
+        notmsg_comp = self._notmsg_comp
+        patterns = self._patterns
+        tmppref = self._tmppref
+        tmpsuf = self._tmpsuf
+        tmphlen = self._tmphlen
+        nxtpref = self._nxtpref
+        nxtsuf = self._nxtsuf
+        
+        ufh = UrlsFileHandler(urlsfname, marker, rmarker)
+        page = ufh.read_line()
+        if page:
+            print('Start download')
+        else:
+            print('No urls')
+            return
+        nh = NoticeHandler(notname, ': ')
+        while page is not None:
+            dirurl = page
+            for p in patterns:
+                tmpph = PageHandler(dirurl, p[0], (p[1], p[2]))
+                tmpph.start()
+                dirurl = tmpph.get_string()
+                tmpph.end()
+            assert dirurl,  'expected the direct url'
+            dh = DownloadHandler(dirurl,
+                                 (tmppref, tmpsuf, page, tmphlen),
+                                 (nxtpref, nxtsuf))
+            dh.start()
+            dh.download()
+            if dh.iscomplete():
+                ufh.replace_line(page)
+                nh.notify(notmsg_load)
+                dh.end()
+            else:
+                dh.end()
+                break
+            page = ufh.read_line()
+        if page is None:
+            nh.notify(notmsg_comp)
+
+class UrlsFileHandler:
+    """Обработчик файла, который может отыскивать маркированные строки
+    и маркировать их другим маркером."""    
+    def __init__(self, fname, marker, rmarker):
+        """
+        fname      имя файла с маркированными строками
+        marker     маркер строки
+        rmarker    маркер замены
+        
+        пример:
+        UrlsFileHandler('urls', '*', '[')
+        """
+        self._fname = fname
+        self._marker = marker
+        self._rmarker = rmarker
+        
+    def read_line(self):
+        #дано    : 
+        #получить: возвращается первая строка, начинающаяся
+        #          с маркера (маркер удаляется)
+        """Найти первую строку, начинающуюся с маркера."""
+        marker = self._marker
+        with open(self._fname, encoding='utf-8') as fin:
+            for line in fin:
+                if line.startswith(marker):
+                    return line[len(marker):].strip()
+        
+    def replace_line(self, s):
+        #дано    : задана строка для замены
+        #получить: строка, начинающаяся с маркера, найдена,
+        #          и маркер заменён на маркер замены
+        """Заменить в строке маркер на маркер замены."""
+        fname, tfname = self._fname, 'tmpfile'
+        marker, rmarker = self._marker, self._rmarker
+        with open(fname, encoding='utf-8') as fin, \
+             open(tfname, 'w', encoding='utf-8') as fout:
+            for line in fin:
+                line = line.rstrip()
+                if line.startswith(marker) and \
+                   line[len(marker):] == s:
+                   print('{0}{1}'.format(rmarker, line[len(marker):]),
+                         file=fout)   
+                else:
+                    print(line, file=fout)
+        os.remove(fname)
+        os.rename(tfname, fname)
+    
+class PageHandler:
+    """Обработчик для отыскивания на странице подстроки, которая
+    находится после начального шаблона между левым и правым шаблонами."""
+    def __init__(self, baseurl, startre, substrre=()):
+        """
+        baseurl     ссылка на страницу
+        startre     шаблон начала поиска
+        substrre    левый и правый шаблоны строки
+        
+        пример:
+        PageHandler('http://site/page',
+                    r'Скачать',
+                    (r'<a href=.', r'. class'))
+        """
+        self._baseurl = baseurl
+        self._startre = startre
+        self._substrre = substrre
+    
+    def start(self):
+        #дано    :
+        #получить: страница открыта
+        """Начать работу, открыв страницу."""
+        self._stream = urllib.request.urlopen(self._baseurl)
+        mo = re.search(r'charset=([a-z0-9-]+)',
+                       self._stream.getheader('Content-Type'),
+                       re.I)
+        if mo is not None:
+            self._charset = mo.group(1)
+        else:
+            self._charset = 'latin1'
+    
+    def get_string(self):
+        # дано    : 
+        # получить: найдена подстрока после начала поиска,
+        #           находящаяся между левым и правым шаблонами
+        """Получить строку со страницы, подходящую под заданные шаблоны."""
+        startpat = self._startre
+        substrpat = '(?P<substr>.+?)'.join(self._substrre)
+        searchflag = False
+        for line in self._stream:
+            linedec = line.decode(self._charset)
+            if not searchflag:
+                if re.search(startpat, linedec):
+                    searchflag = True
+            if searchflag:
+                match = re.search(substrpat, linedec)
+                if match is not None:
+                    return match.group('substr')
+    
+    def end(self):
+        #дано    :
+        #получить: страница закрыта 
+        """Закончить работу, закрыв страницу."""
+        self._stream.close()
+
+class DownloadHandler:
+    """Обработчик для закачивания и сохранения файла."""
+    def __init__(self, baseurl, tmpnameinfo, nxtnameinfo):
+        """
+        baseurl        ссылка на файл
+        tmpnameinfo    информация для временного имени файла
+                       (prefix, suffix, string, hashlen)
+        nxtnameinfo    информация для постоянного имени файла
+                       (prefix, suffix)
+        
+        пример:
+        DownloadHandler('http://file',
+                        ('tmp', '.mp4', 'string', 8),
+                        ('nxt', '.mp4'))
+                
+        """
+        self._baseurl = baseurl
+        self._tmpnameinfo = tmpnameinfo
+        self._nxtnameinfo = nxtnameinfo
+        
+    def start(self):
+        #дано    :
+        #получить: флаг полноты закачки установлен в False
+        """Начать работу и установить флаг закачки в False."""
+        self._complete = False
+    
+    def download(self):
+        #дано    :
+        #получить: выполнена закачка файла;
+        #          если файл не докачан, то у него временное имя
+        #          если файл докачан, то у него имя по порядку
+        """Закачать файл и сохранить его под временным именем,
+        если файл не докачан, либо под именем по порядку, если файл
+        докачан."""
+        tmppref, tmpsuf, s, hlen = self._tmpnameinfo
+        nxtpref, nxtsuf = self._nxtnameinfo
+        nh = NameHandler(s, hlen)
+        tmpname = nh.get_tmp(tmppref, tmpsuf)
+        nxtname = nh.get_next(nxtpref, nxtsuf)
+        wg = WgetHandler(self._baseurl)
+        if wg.download(tmpname):
+            os.rename(tmpname, nxtname)
+            self._complete = True
+
+    def iscomplete(self):
+        #дано    :
+        #получить: возвращается признак полноты закачки True/False
+        """Возвратить признак полноты закачки True/False."""
+        return self._complete
+    
+    def end(self):
+        #дано    :
+        #получить: 
+        """Завершить работу, ничего не делая."""
+        pass
+
+class NameHandler:
+    """Создатель файловых имён: временного и следующего за
+    существующим в каталоге."""
+    def __init__(self, hs, hlen):
+        """
+        hs      строка для формирования последовательности
+                временного имени
+        hlen    длина последовательности временного имени
+        
+        пример:
+        NameHandler('string', 8)
+        
+        """
+        self._hs = hs
+        self._hlen = hlen
+        
+    def get_tmp(self, pref, suf):
+        #дано    : заданы префикс и суффикс имени
+        #получить: возвращается имя временного файла, состоящее из
+        #          префикс+число+суффикс, где число сформировано
+        #          из строки
+        """Создать временное имя в виде префикс+число+суффикс, где
+        число формируется из строки."""
+        shash = hashlib.md5(self._hs.encode('utf-8')).hexdigest()
+        return '{0}{1}{2}'.format(pref, shash[:self._hlen], suf)
+    
+    def get_next(self, pref, suf):
+        #дано    : заданы префикс и суффикс имени
+        #получить: возвращается имя следующего файла в каталоге,
+        #          состоящее из префикс+номер+суффикс, где номер
+        #          является следующим за найденным в каталоге
+        #          (1 - номер по умолчанию)
+        """Возвратить имя следующего файла в виде префикс+номер+суффикс,
+        где номер является следующим за найденным в каталоге
+        (1 - номер по умолчанию)."""
+        escpref, escsuf = re.escape(pref), re.escape(suf)
+        pat = re.compile(r'{0}(\d+){1}'.format(escpref, escsuf))
+        files = tuple(filter(pat.match, os.listdir('.')))
+        if not files:
+            name = '{0}1{1}'.format(pref, suf)
+        else:
+            n = max(int(pat.match(i).group(1)) for i in files)
+            name = '{0}{1}{2}'.format(pref, n + 1, suf)
+        return name
+    
+class WgetHandler:
+    """Загрузчик файла на основе wget."""
+    def __init__(self, baseurl):
+        """
+        baseurl    ссылка на файл
+        
+        пример:
+        WgetHandler('http://file')
+        
+        """
+        def prepare_url(url):
+            if url.startswith('//'):
+                out = 'http:' + url
+            else:
+                out = url
+            return out
+        self._baseurl = prepare_url(baseurl)
+    
+    def download(self, save_name=None):
+        #дано    : задано имя файла или имя по умолчанию
+        #получить: ссылка скачана (с выводом скачивания на экран),
+        #          файл сохранён с заданным именем
+        #          (по умолчанию - под своим);
+        #          возвращает True/False в зависимости от
+        #          скачанности файла
+        """Скачать файл по ссылке, сохранив под заданным именем.
+        Если имя не задано, то сохранить под собственным именем."""
+        cmdlst = ['wget', '-c', '--user-agent="Mozilla"', '--no-check-certificate']
+        if save_name is None:
+            cmdlst.extend([self._baseurl, '-P', '.'])
+        else:
+            cmdlst.extend([self._baseurl, '-O', save_name])
+        try:
+            p = subprocess.Popen(cmdlst)
+            p.wait()
+        except KeyboardInterrupt:
+            return False
+        return p.returncode == 0
+
+class NoticeHandler:
+    """Уведомитель, выводящий сообщение пользователю."""
+    def __init__(self, name, sep):
+        """
+        name    название уведомителя
+        sep     разделитель между названием и сообщением
+        
+        пример:
+        NoticeHandler('notifier', ': ')
+        
+        """
+        self._name = name
+        self._sep = sep
+    
+    def notify(self, s):
+        #дано    : задана строка s
+        #получить: выведено сообщение name+sep+s
+        cmdlst = ['kdialog', '--passivepopup',
+                  '{0}{1}{2}'.format(self._name, self._sep, s)]
+        subprocess.call(cmdlst)
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        cfname = sys.argv[1]
+    else:
+        cfname = 'loader.xml'
+    cfh = ConfigFileHandler(cfname)
+    cfh.load_config()
+    assert cfh.getname()
+    print('Load config... ', cfh.getname())
+    ufname, marker, rmarker = cfh.geturls()
+    nname, nload, ncomp = cfh.getnotice()
+    patterns = cfh.getpatterns()
+    tpref, tsuf, tlen = cfh.gettemp()
+    npref, nsuf = cfh.getfinal()
+    fd = FilesDownloader(ufname, marker, rmarker,
+                         nname, nload, ncomp,
+                         patterns,
+                         tpref, tsuf, tlen,
+                         npref, nsuf)
+    fd.download_files()
