@@ -1,0 +1,150 @@
+#+STARTUP: content logdone hideblocks
+#+TODO: TASK(t!) | DONE(d) CANCEL(c)
+#+TODO: BUG(b!) | FIXED(f) REJECT(r)
+#+PRIORITIES: A F C
+#+TAGS: current(c) testing(t)
+#+CONSTANTS: last_issue_id=17
+
+* Задачи
+  :PROPERTIES:
+  :COLUMNS:  %3issue_id(ID) %4issue_type(TYPE) %TODO %40ITEM %SCHEDULED %DEADLINE %1PRIORITY
+  :ARCHIVE:  tasks_archive.org::* Архив задач
+  :END:
+
+** TASK Добавить возможность отключения уведомлений
+   :PROPERTIES:
+   :issue_id: 1
+   :issue_type: task
+   :END:
+   - с командной строки
+   - в настройках
+
+** TASK Сделать видимую связь временного файла со ссылкой в списке ссылок
+   :PROPERTIES:
+   :issue_id: 2
+   :issue_type: task
+   :END:
+
+** TASK Задать имя файла рядом со ссылкой в списке ссылок
+   :PROPERTIES:
+   :issue_id: 3
+   :issue_type: task
+   :END:
+
+** TASK Сделать информативный режим отладки при загрузке ссылки
+   :PROPERTIES:
+   :issue_id: 4
+   :issue_type: task
+   :END:
+
+** TASK [#A] Провести ссылку из исходника страницы через преобразования
+   :PROPERTIES:
+   :issue_id: 5
+   :issue_type: task
+   :END:
+
+   Найденную в тексте ссылку нужно почистить перед открытием, так как
+   найдена бывает какая-то js-внутренность с символами бэкслеша и
+   другими.
+
+   На каждом этапе полученная ссылка должна преобразовываться в
+   соответствии с её индивидуальной настройкой.
+
+** TASK Атрибуты xml переделать в текстовые узлы
+   :PROPERTIES:
+   :issue_id: 6
+   :issue_type: task
+   :END:
+
+** TASK Сделать настройку для изображения браузера
+   :PROPERTIES:
+   :issue_id: 7
+   :issue_type: task
+   :END:
+   - агента
+   - реферера
+
+** TASK Сделать помощник для создания файла настройки
+   :PROPERTIES:
+   :issue_id: 8
+   :issue_type: task
+   :END:
+
+   Он должен показывать, находится ли ссылка, без её загрузки. Это
+   вроде отладки, но который официально помогает сформировать файл
+   настроек и показывает заранее результаты по нему.
+
+** TASK Сделать возможность взятия ссылок из потока ввода
+   :PROPERTIES:
+   :issue_id: 9
+   :issue_type: task
+   :END:
+
+   Сейчас ссылки могут браться только из файла, но бывает, что нужно
+   закачать одну ссылку, имея файл настроек.
+
+** TASK Сделать возможность перекрытия настроек из командной строки
+   :PROPERTIES:
+   :issue_id: 10
+   :issue_type: task
+   :END:
+
+
+* Баги
+  :PROPERTIES:
+  :COLUMNS:  %3issue_id(ID) %4issue_type(TYPE) %TODO %40ITEM %SCHEDULED %DEADLINE %1PRIORITY
+  :ARCHIVE:  tasks_archive.org::* Архив багов
+  :END:
+
+** BUG Имя файла после его загрузки формировать во время сохранения
+   :PROPERTIES:
+   :issue_id: 11
+   :issue_type: bug
+   :END:
+   Если имя выбрано в самом начале закачки, то в середине закачки
+   список файлов может быть изменён (удалены файлы). Когда закачка
+   завершена, нужно учитывать новый состав файлов, а не сохранять под
+   начальным.
+
+** BUG исключить два закачивания в один файл
+   :PROPERTIES:
+   :issue_id: 12
+   :issue_type: bug
+   :END:
+
+
+* Окружение
+  :PROPERTIES:
+  :COLUMNS:  %3issue_id(ID) %4issue_type(TYPE) %TODO %40ITEM %SCHEDULED %DEADLINE %1PRIORITY
+  :ARCHIVE:  tasks_archive.org::* Архив окружения
+  :END:
+
+** TASK Придумать более конкретное название программы
+   :PROPERTIES:
+   :issue_id: 13
+   :issue_type: task
+   :END:
+
+** TASK Сделать подходящий для общего пользования README
+   :PROPERTIES:
+   :issue_id: 14
+   :issue_type: task
+   :END:
+
+** TASK Сделать лог версий в NEWS
+   :PROPERTIES:
+   :issue_id: 15
+   :issue_type: task
+   :END:
+
+** TASK Сделать Makefile
+   :PROPERTIES:
+   :issue_id: 16
+   :issue_type: task
+   :END:
+
+** TASK Создать репозиторий
+   :PROPERTIES:
+   :issue_id: 17
+   :issue_type: task
+   :END:
