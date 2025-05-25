@@ -6,9 +6,9 @@
     <pattern start=""
              left=""
              right="" />
-    <pattern start=''
-             left=''
-             right='' />
+    <pattern start=""
+             left=""
+             right="" />
   </patterns>
   <temp prefix="" suffix="" random="" />
   <final prefix="" suffix="" />
