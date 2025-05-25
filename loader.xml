@@ -10,6 +10,7 @@
              left=""
              right="" />
   </patterns>
+  <load cmd="" />
   <temp prefix="" suffix="" random="" />
   <final prefix="" suffix="" />
 </site>

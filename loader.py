@@ -26,15 +26,15 @@ class ConfigFileHandler:
     def __init__(self, fname):
         """
         fname      имя файла
-        
+
         пример:
         ConfigFileHandler('loader.xml')
         """
         self._fname = fname
         self._dct = {}
-        
+
     def load_config(self):
-        #дано    : 
+        #дано    :
         #получить: из xml-файла данные загружены в словарь
         """Загрузить данные из файла."""
         root = xml.etree.ElementTree.parse(self._fname)
@@ -54,44 +54,60 @@ class ConfigFileHandler:
             elif tag == 'pattern':
                 self._dct['patterns'].append(
                     (att['start'], att['left'], att['right']))
+            elif tag == 'load':
+                self._dct[tag] = att['cmd']
             elif tag == 'temp':
                 self._dct[tag] = (att['prefix'], att['suffix'],
                                   int(att['random']))
             elif tag == 'final':
                 self._dct[tag] = (att['prefix'], att['suffix'])
-        
+
     def getname(self):
-        #дано    : 
+        #дано    :
         #получить: название сайта
         """Имя сайта."""
         return self._dct['site']
-        
+
     def geturls(self):
-        #дано    : 
+        #дано    :
         #получить: ссылки (файл, маркер, маркер замены)
         """Ссылки (файл, маркер, маркер замены)."""
         return self._dct['urls']
-        
+
     def getnotice(self):
-        #дано    : 
+        #дано    :
         #получить: уведомления (название, один, все)
         """Уведомления (название, один, все)."""
         return self._dct['notice']
-        
+
     def getpatterns(self):
-        #дано    : 
+        #дано    :
         #получить: список шаблонов [(начало, левый, правый), ...]
         """Список шаблонов [(начало, левый, правый), ...]."""
         return self._dct['patterns']
-        
+
+    def getload(self):
+        #дано    :
+        #получить: команда с аргументами для загрузки файла
+        """Команда с аргументами для загрузки файла.
+
+        Пример:
+          curl %url -o %file
+          wget %url -O %file
+          youtube-dl -c %url -o %file
+          yt-dlp -c --proxy socks5://localhost:1080 %url -o %file
+
+        """
+        return self._dct['load']
+
     def gettemp(self):
-        #дано    : 
+        #дано    :
         #получить: временное имя (префикс, суффикс, число)
         """Временное имя (префикс, суффикс, число)."""
         return self._dct['temp']
-        
+
     def getfinal(self):
-        #дано    : 
+        #дано    :
         #получить: постоянное имя (префикс, суффикс)
         """Постоянное имя (префикс, суффикс)."""
         return self._dct['final']
@@ -102,6 +118,7 @@ class FilesDownloader:
                  urlsfname, marker, rmarker,
                  notname, notmsg_load, notmsg_comp,
                  patterns,
+                 loadcmd,
                  tmppref, tmpsuf, tmphlen,
                  nxtpref, nxtsuf):
         """
@@ -116,17 +133,19 @@ class FilesDownloader:
                          - шаблон начала поиска
                          - левый шаблон строки
                          - правый шаблон строки
+        loadcmd        команда загрузки с аргументами %url и %file
         tmppref        префикс временного файла
         tmpsuf         суффикс временного файла
         tmphlen        длина последовательности временного файла
         nxtpref        префикс постоянного файла
         nxtsuf         суффикс постоянного файла
-        
+
         пример:
         FilesDownloader('urls', '*', '[',
                         'partv', 'loaded', 'complete',
                         [(r'Скачать', r'<a href=.', r'. class'),
-                         (r'Скачать', r'<a href=.', r'. class')]
+                         (r'Скачать', r'<a href=.', r'. class')],
+                        'curl %url -o %file',
                         'tmp_', '.mp4', 8,
                         't', '.mp4')
         """
@@ -137,14 +156,15 @@ class FilesDownloader:
         self._notmsg_load = notmsg_load
         self._notmsg_comp = notmsg_comp
         self._patterns = patterns
+        self._loadcmd = loadcmd
         self._tmppref = tmppref
         self._tmpsuf = tmpsuf
         self._tmphlen = tmphlen
         self._nxtpref = nxtpref
         self._nxtsuf = nxtsuf
-        
+
     def download_files(self):
-        #дано    : 
+        #дано    :
         #получить: по ссылкам с маркером из файла загружены
         #          файлы, загруженные ссылки отмечены другим
         #          маркером
@@ -159,12 +179,13 @@ class FilesDownloader:
         notmsg_load = self._notmsg_load
         notmsg_comp = self._notmsg_comp
         patterns = self._patterns
+        loadcmd = self._loadcmd
         tmppref = self._tmppref
         tmpsuf = self._tmpsuf
         tmphlen = self._tmphlen
         nxtpref = self._nxtpref
         nxtsuf = self._nxtsuf
-        
+
         ufh = UrlsFileHandler(urlsfname, marker, rmarker)
         page = ufh.read_line()
         if page:
@@ -181,7 +202,8 @@ class FilesDownloader:
                 dirurl = tmpph.get_string()
                 tmpph.end()
             assert dirurl,  'expected the direct url'
-            dh = DownloadHandler(dirurl,
+            dh = DownloadHandler(loadcmd,
+                                 dirurl,
                                  (tmppref, tmpsuf, page, tmphlen),
                                  (nxtpref, nxtsuf))
             dh.start()
@@ -199,22 +221,22 @@ class FilesDownloader:
 
 class UrlsFileHandler:
     """Обработчик файла, который может отыскивать маркированные строки
-    и маркировать их другим маркером."""    
+    и маркировать их другим маркером."""
     def __init__(self, fname, marker, rmarker):
         """
         fname      имя файла с маркированными строками
         marker     маркер строки
         rmarker    маркер замены
-        
+
         пример:
         UrlsFileHandler('urls', '*', '[')
         """
         self._fname = fname
         self._marker = marker
         self._rmarker = rmarker
-        
+
     def read_line(self):
-        #дано    : 
+        #дано    :
         #получить: возвращается первая строка, начинающаяся
         #          с маркера (маркер удаляется)
         """Найти первую строку, начинающуюся с маркера."""
@@ -223,7 +245,7 @@ class UrlsFileHandler:
             for line in fin:
                 if line.startswith(marker):
                     return line[len(marker):].strip()
-        
+
     def replace_line(self, s):
         #дано    : задана строка для замены
         #получить: строка, начинающаяся с маркера, найдена,
@@ -238,12 +260,12 @@ class UrlsFileHandler:
                 if line.startswith(marker) and \
                    line[len(marker):] == s:
                    print('{0}{1}'.format(rmarker, line[len(marker):]),
-                         file=fout)   
+                         file=fout)
                 else:
                     print(line, file=fout)
         os.remove(fname)
         os.rename(tfname, fname)
-    
+
 class PageHandler:
     """Обработчик для отыскивания на странице подстроки, которая
     находится после начального шаблона между левым и правым шаблонами."""
@@ -252,7 +274,7 @@ class PageHandler:
         baseurl     ссылка на страницу
         startre     шаблон начала поиска
         substrre    левый и правый шаблоны строки
-        
+
         пример:
         PageHandler('http://site/page',
                     r'Скачать',
@@ -261,7 +283,7 @@ class PageHandler:
         self._baseurl = baseurl
         self._startre = startre
         self._substrre = substrre
-    
+
     def start(self):
         #дано    :
         #получить: страница открыта
@@ -274,9 +296,9 @@ class PageHandler:
             self._charset = mo.group(1)
         else:
             self._charset = 'latin1'
-    
+
     def get_string(self):
-        # дано    : 
+        # дано    :
         # получить: найдена подстрока после начала поиска,
         #           находящаяся между левым и правым шаблонами
         """Получить строку со страницы, подходящую под заданные шаблоны."""
@@ -292,39 +314,43 @@ class PageHandler:
                 match = re.search(substrpat, linedec)
                 if match is not None:
                     return match.group('substr')
-    
+
     def end(self):
         #дано    :
-        #получить: страница закрыта 
+        #получить: страница закрыта
         """Закончить работу, закрыв страницу."""
         self._stream.close()
 
 class DownloadHandler:
     """Обработчик для закачивания и сохранения файла."""
-    def __init__(self, baseurl, tmpnameinfo, nxtnameinfo):
+    def __init__(self, loadcmd, baseurl, tmpnameinfo, nxtnameinfo):
         """
+        loadcmd        команда с аргументами для скачивания
+                       "prog %url -o %file"
         baseurl        ссылка на файл
         tmpnameinfo    информация для временного имени файла
                        (prefix, suffix, string, hashlen)
         nxtnameinfo    информация для постоянного имени файла
                        (prefix, suffix)
-        
+
         пример:
-        DownloadHandler('http://file',
+        DownloadHandler('curl %url -o %file',
+                        'http://file',
                         ('tmp', '.mp4', 'string', 8),
                         ('nxt', '.mp4'))
-                
+
         """
+        self._loadcmd = loadcmd
         self._baseurl = baseurl
         self._tmpnameinfo = tmpnameinfo
         self._nxtnameinfo = nxtnameinfo
-        
+
     def start(self):
         #дано    :
         #получить: флаг полноты закачки установлен в False
         """Начать работу и установить флаг закачки в False."""
         self._complete = False
-    
+
     def download(self):
         #дано    :
         #получить: выполнена закачка файла;
@@ -338,8 +364,8 @@ class DownloadHandler:
         nh = NameHandler(s, hlen)
         tmpname = nh.get_tmp(tmppref, tmpsuf)
         nxtname = nh.get_next(nxtpref, nxtsuf)
-        wg = WgetHandler(self._baseurl)
-        if wg.download(tmpname):
+        lh = LoadHandler(self._loadcmd, self._baseurl)
+        if lh.download(tmpname):
             os.rename(tmpname, nxtname)
             self._complete = True
 
@@ -348,10 +374,10 @@ class DownloadHandler:
         #получить: возвращается признак полноты закачки True/False
         """Возвратить признак полноты закачки True/False."""
         return self._complete
-    
+
     def end(self):
         #дано    :
-        #получить: 
+        #получить:
         """Завершить работу, ничего не делая."""
         pass
 
@@ -363,14 +389,14 @@ class NameHandler:
         hs      строка для формирования последовательности
                 временного имени
         hlen    длина последовательности временного имени
-        
+
         пример:
         NameHandler('string', 8)
-        
+
         """
         self._hs = hs
         self._hlen = hlen
-        
+
     def get_tmp(self, pref, suf):
         #дано    : заданы префикс и суффикс имени
         #получить: возвращается имя временного файла, состоящее из
@@ -380,7 +406,7 @@ class NameHandler:
         число формируется из строки."""
         shash = hashlib.md5(self._hs.encode('utf-8')).hexdigest()
         return '{0}{1}{2}'.format(pref, shash[:self._hlen], suf)
-    
+
     def get_next(self, pref, suf):
         #дано    : заданы префикс и суффикс имени
         #получить: возвращается имя следующего файла в каталоге,
@@ -399,16 +425,19 @@ class NameHandler:
             n = max(int(pat.match(i).group(1)) for i in files)
             name = '{0}{1}{2}'.format(pref, n + 1, suf)
         return name
-    
-class WgetHandler:
-    """Загрузчик файла на основе wget."""
-    def __init__(self, baseurl):
+
+class LoadHandler:
+    """Загрузчик файла через команду общего вида."""
+    def __init__(self, loadcmd, baseurl):
         """
+        loadcmd    команда с аргументами для скачивания
+                   "prog %url -o %file"
         baseurl    ссылка на файл
-        
-        пример:
-        WgetHandler('http://file')
-        
+
+        Пример:
+
+        LoadHandler('curl %url -o %file', 'http://file')
+
         """
         def prepare_url(url):
             if url.startswith('//'):
@@ -416,8 +445,9 @@ class WgetHandler:
             else:
                 out = url
             return out
+        self._loadcmd = loadcmd
         self._baseurl = prepare_url(baseurl)
-    
+
     def download(self, save_name=None):
         #дано    : задано имя файла или имя по умолчанию
         #получить: ссылка скачана (с выводом скачивания на экран),
@@ -426,12 +456,16 @@ class WgetHandler:
         #          возвращает True/False в зависимости от
         #          скачанности файла
         """Скачать файл по ссылке, сохранив под заданным именем.
-        Если имя не задано, то сохранить под собственным именем."""
-        cmdlst = ['wget', '-c', '--user-agent="Mozilla"', '--no-check-certificate']
-        if save_name is None:
-            cmdlst.extend([self._baseurl, '-P', '.'])
-        else:
-            cmdlst.extend([self._baseurl, '-O', save_name])
+        Если имя не задано, то сохранить под неизвестным именем."""
+        cmdlst = self._loadcmd.split()
+        for i, string in enumerate(cmdlst):
+            if string == '%url':
+                cmdlst[i] = self._baseurl
+            if string == '%file':
+                if save_name:
+                    cmdlst[i] = save_name
+                else:
+                    cmdlst[i] = 'unknown_' + self._baseurl
         try:
             p = subprocess.Popen(cmdlst)
             p.wait()
@@ -445,14 +479,14 @@ class NoticeHandler:
         """
         name    название уведомителя
         sep     разделитель между названием и сообщением
-        
+
         пример:
         NoticeHandler('notifier', ': ')
-        
+
         """
         self._name = name
         self._sep = sep
-    
+
     def notify(self, s):
         #дано    : задана строка s
         #получить: выведено сообщение name+sep+s
@@ -468,15 +502,17 @@ if __name__ == '__main__':
     cfh = ConfigFileHandler(cfname)
     cfh.load_config()
     assert cfh.getname()
-    print('Load config... ', cfh.getname())
+    print('Load config...', cfh.getname())
     ufname, marker, rmarker = cfh.geturls()
     nname, nload, ncomp = cfh.getnotice()
     patterns = cfh.getpatterns()
+    loadcmd = cfh.getload()
     tpref, tsuf, tlen = cfh.gettemp()
     npref, nsuf = cfh.getfinal()
     fd = FilesDownloader(ufname, marker, rmarker,
                          nname, nload, ncomp,
                          patterns,
+                         loadcmd,
                          tpref, tsuf, tlen,
                          npref, nsuf)
     fd.download_files()
