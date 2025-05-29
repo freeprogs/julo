@@ -457,7 +457,8 @@ class LoadHandler:
         #          скачанности файла
         """Скачать файл по ссылке, сохранив под заданным именем.
         Если имя не задано, то сохранить под неизвестным именем."""
-        cmdlst = self._loadcmd.split()
+        clh = CommandLineHandler()
+        cmdlst = clh.split(self._loadcmd)
         for i, string in enumerate(cmdlst):
             if string == '%url':
                 cmdlst[i] = self._baseurl
@@ -472,6 +473,89 @@ class LoadHandler:
         except KeyboardInterrupt:
             return False
         return p.returncode == 0
+
+class CommandLineHandler:
+    """Обработчик командной строки с аргументами."""
+    def split(self, s):
+        #дано    : командная строка с аргументами
+        #получить: список аргументов, разделённых по пробелам,
+        #          исключая пробелы в двойных и в одинарных кавычках
+        """Разделить командную строку на аргументы с учётом того, что
+        пробелы могут находиться в аргументах в двойных и в одинарных
+        кавычках, а также быть экранированными с помощью бэкслеша."""
+        out = []
+        arg = ''
+        state = 'start'
+        for ch in s:
+            if state == 'start':
+                if ch == ' ':
+                    state = 'spaces'
+                elif ch == '"':
+                    state = 'dquote'
+                elif ch == "'":
+                    state = 'squote'
+                else:
+                    arg += ch
+                    state = 'normal'
+            elif state == 'normal':
+                if ch == ' ':
+                    if arg:
+                        out.append(arg)
+                    arg = ''
+                    state = 'spaces'
+                    continue
+                elif ch == '"':
+                    state = 'dquote'
+                elif ch == "'":
+                    state = 'squote'
+                elif ch == '\\':
+                    arg += ch
+                    state = 'bslash normal'
+                else:
+                    arg += ch
+            elif state == 'spaces':
+                if ch == ' ':
+                    continue
+                if ch == '"':
+                    state = 'dquote'
+                elif ch == '\'':
+                    state = 'squote'
+                elif ch == '\\':
+                    state = 'bslash normal'
+                    arg = ch
+                else:
+                    arg = ch
+                    state = 'normal'
+            elif state == 'dquote':
+                if ch == '"':
+                    out.append(arg)
+                    arg = ''
+                    state = 'normal'
+                    continue
+                elif ch == '\\':
+                    state = 'bslash dquote'
+                arg += ch
+            elif state == 'squote':
+                if ch == '\'':
+                    out.append(arg)
+                    arg = ''
+                    state = 'normal'
+                    continue
+                elif ch == '\\':
+                    state = 'bslash squote'
+                arg += ch
+            elif state == 'bslash normal':
+                arg += ch
+                state = 'normal'
+            elif state == 'bslash dquote':
+                arg += ch
+                state = 'dquote'
+            elif state == 'bslash squote':
+                arg += ch
+                state = 'squote'
+        if arg:
+            out.append(arg)
+        return out
 
 class NoticeHandler:
     """Уведомитель, выводящий сообщение пользователю."""
