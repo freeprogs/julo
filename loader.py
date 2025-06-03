@@ -17,6 +17,7 @@ import urllib.request
 import urllib.error
 import re
 import subprocess
+import io
 import hashlib
 import xml.etree.ElementTree
 import sys
@@ -53,7 +54,7 @@ class ConfigFileHandler:
                 self._dct[tag] = []
             elif tag == 'pattern':
                 self._dct['patterns'].append(
-                    (att['start'], att['left'], att['right']))
+                    (att.get('load'), att['start'], att['left'], att['right']))
             elif tag == 'load':
                 self._dct[tag] = att['cmd']
             elif tag == 'temp':
@@ -82,8 +83,8 @@ class ConfigFileHandler:
 
     def getpatterns(self):
         #дано    :
-        #получить: список шаблонов [(начало, левый, правый), ...]
-        """Список шаблонов [(начало, левый, правый), ...]."""
+        #получить: список шаблонов [(загрузчик, начало, левый, правый), ...]
+        """Список шаблонов [(загрузчик, начало, левый, правый), ...]."""
         return self._dct['patterns']
 
     def getload(self):
@@ -129,7 +130,8 @@ class FilesDownloader:
         notname        название уведомителя
         notmsg_load    сообщение для уведомления о загрузке
         notmsg_comp    сообщение для уведомления о завершении
-        patterns       список с тройками шаблонов (в кортежах):
+        patterns       список с загрузчиком и шаблонами (в кортежах):
+                         - команда загрузки с аргументом %url
                          - шаблон начала поиска
                          - левый шаблон строки
                          - правый шаблон строки
@@ -143,8 +145,8 @@ class FilesDownloader:
         пример:
         FilesDownloader('urls', '*', '[',
                         'partv', 'loaded', 'complete',
-                        [(r'Скачать', r'<a href=.', r'. class'),
-                         (r'Скачать', r'<a href=.', r'. class')],
+                        [('curl %url', r'Скачать', r'<a href=.', r'. class'),
+                         ('curl %url', r'Скачать', r'<a href=.', r'. class')],
                         'curl %url -o %file',
                         'tmp_', '.mp4', 8,
                         't', '.mp4')
@@ -197,7 +199,7 @@ class FilesDownloader:
         while page is not None:
             dirurl = page
             for p in patterns:
-                tmpph = PageHandler(dirurl, p[0], (p[1], p[2]))
+                tmpph = PageHandler(dirurl, p[0], p[1], (p[2], p[3]))
                 tmpph.start()
                 dirurl = tmpph.get_string()
                 tmpph.end()
@@ -267,35 +269,44 @@ class UrlsFileHandler:
         os.rename(tfname, fname)
 
 class PageHandler:
-    """Обработчик для отыскивания на странице подстроки, которая
-    находится после начального шаблона между левым и правым шаблонами."""
-    def __init__(self, baseurl, startre, substrre=()):
+    """Обработчик для отыскивания на странице, загруженной с помощью
+    команды загрузки, подстроки, которая находится после начального
+    шаблона между левым и правым шаблонами."""
+    def __init__(self, baseurl, loadcmd, startre, substrre=()):
         """
         baseurl     ссылка на страницу
+        loadcmd     команда загрузки страницы с аргументом %url
+                    при значении None используется команда по умолчанию
         startre     шаблон начала поиска
         substrre    левый и правый шаблоны строки
 
         пример:
         PageHandler('http://site/page',
+                    'curl %url',
                     r'Скачать',
                     (r'<a href=.', r'. class'))
         """
         self._baseurl = baseurl
+        self._loadcmd = loadcmd
         self._startre = startre
         self._substrre = substrre
+        self._stream = None
+        self._charset = None
 
     def start(self):
         #дано    :
         #получить: страница открыта
         """Начать работу, открыв страницу."""
-        self._stream = urllib.request.urlopen(self._baseurl)
-        mo = re.search(r'charset=([a-z0-9-]+)',
-                       self._stream.getheader('Content-Type'),
-                       re.I)
-        if mo is not None:
-            self._charset = mo.group(1)
+        if self._loadcmd is None:
+            pdl = PageDefaultLoader()
+            pdl.open_stream(self._baseurl)
+            self._stream = pdl.get_stream()
+            self._charset = pdl.get_charset()
         else:
-            self._charset = 'latin1'
+            pcl = PageCmdlineLoader(self._loadcmd)
+            pcl.open_stream(self._baseurl)
+            self._stream = pcl.get_stream()
+            self._charset = pcl.get_charset()
 
     def get_string(self):
         # дано    :
@@ -320,6 +331,53 @@ class PageHandler:
         #получить: страница закрыта
         """Закончить работу, закрыв страницу."""
         self._stream.close()
+
+class PageDefaultLoader:
+    """Загрузчик страницы, который загружает страницу через встроенные
+    средства."""
+    def __init__(self):
+        self._stream = None
+        self._charset = None
+
+    def open_stream(self, url):
+        self._stream = urllib.request.urlopen(url)
+        mo = re.search(r'charset=([a-z0-9-]+)',
+                       self._stream.getheader('Content-Type'),
+                       re.I)
+        if mo is not None:
+            self._charset = mo.group(1)
+        else:
+            self._charset = 'latin1'
+
+    def get_stream(self):
+        return self._stream
+
+    def get_charset(self):
+        return self._charset
+
+class PageCmdlineLoader:
+    """Загрузчик страницы, который загружает страницу через внешний
+    процесс."""
+    def __init__(self, cmd):
+        self._cmd = cmd
+        self._stream = None
+        self._charset = None
+
+    def open_stream(self, url):
+        clh = CommandLineHandler()
+        cmdlst = clh.split(self._cmd)
+        for i, string in enumerate(cmdlst):
+            if string == '%url':
+                cmdlst[i] = url
+        p = subprocess.Popen(cmdlst, stdout=subprocess.PIPE)
+        self._stream = io.BytesIO(p.communicate()[0])
+        self._charset = 'utf-8'
+
+    def get_stream(self):
+        return self._stream
+
+    def get_charset(self):
+        return self._charset
 
 class DownloadHandler:
     """Обработчик для закачивания и сохранения файла."""

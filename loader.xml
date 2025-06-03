@@ -3,10 +3,12 @@
   <urls file="" search="" replace="" />
   <notice name="" one="" all="" />
   <patterns>
-    <pattern start=""
+    <pattern load=""
+	     start=""
              left=""
              right="" />
-    <pattern start=""
+    <pattern load=""
+	     start=""
              left=""
              right="" />
   </patterns>
