@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pytest
-import loader
+import julo
 
 
 @pytest.mark.parametrize(
@@ -47,4 +47,4 @@ import loader
 )
 def test_command_line_split(io):
     i, o = io
-    assert loader.CommandLineHandler().split(i) == o, str((i, o))
+    assert julo.CommandLineHandler().split(i) == o, str((i, o))
