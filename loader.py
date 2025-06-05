@@ -29,7 +29,7 @@ class ConfigFileHandler:
         fname      имя файла
 
         пример:
-        ConfigFileHandler('loader.xml')
+        ConfigFileHandler('julo.xml')
         """
         self._fname = fname
         self._dct = {}
@@ -640,7 +640,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         cfname = sys.argv[1]
     else:
-        cfname = 'loader.xml'
+        cfname = 'julo.xml'
     cfh = ConfigFileHandler(cfname)
     cfh.load_config()
     assert cfh.getname()
