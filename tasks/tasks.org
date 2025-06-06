@@ -3,7 +3,7 @@
 #+TODO: BUG(b!) | FIXED(f) REJECT(r)
 #+PRIORITIES: A F C
 #+TAGS: current(c) testing(t)
-#+CONSTANTS: last_issue_id=19
+#+CONSTANTS: last_issue_id=20
 
 * Задачи
   :PROPERTIES:
@@ -175,3 +175,15 @@
    :issue_id: 17
    :issue_type: task
    :END:
+
+** TASK Создать страницу man
+   :PROPERTIES:
+   :issue_id: 20
+   :issue_type: task
+   :END:
+
+   [2025-06-06 Пт 23:56]
+
+   Нужно создать страницу помощи, в которой написать разные конкретные
+   примеры для закачки с разных сайтов, чтобы незнакомый пользователь
+   мог повторить настройки и у него по ним получилось скачать файл.
