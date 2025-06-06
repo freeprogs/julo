@@ -3,7 +3,7 @@
 #+TODO: BUG(b!) | FIXED(f) REJECT(r)
 #+PRIORITIES: A F C
 #+TAGS: current(c) testing(t)
-#+CONSTANTS: last_issue_id=20
+#+CONSTANTS: last_issue_id=21
 
 * Задачи
   :PROPERTIES:
@@ -116,6 +116,13 @@
    контексте регулярного выражения. Для всего этого нужно сделать
    простой текстовый интерфейс, который даёт возможность создать файл
    настроек от начала до конца и заполнить его полностью.
+
+** TASK Добавить полноценный набор аргументов командной строки
+   :PROPERTIES:
+   :issue_id: 21
+   :issue_type: task
+   :END:
+
 
 * Баги
   :PROPERTIES:
