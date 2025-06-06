@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# This configure is a part of julo
+#
+# Copyright (C) 2012-2025, Slava <freeprogs.feedback@yandex.ru>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+progname=`basename $0`
+
+m4dir="m4"
+
+# Create makefile without debug information
+# create_makefile()
+create_makefile()
+{
+    m4 -P "$m4dir"/version.m4 \
+          makefile.template > Makefile
+}
+
+# Print short help about this script
+# usage()
+usage()
+{
+    echo "Try \`./$progname --help' for more information." >&2
+}
+
+# Print full help about this script
+# print_help()
+print_help()
+{
+    {
+        echo "usage: ./$progname"
+        echo ""
+        echo "  Create Makefile, using m4 templates from m4 directory."
+
+    } >&2
+}
+
+# Run main script operations
+# main([cmdarg])
+main()
+{
+    if [ $# -ne 0 -a "$1" = "--help" ]; then
+        print_help
+        return 1
+    fi
+    usage
+    create_makefile
+    echo "Makefile created, run \`make'."
+    return 0
+}
+
+main "$@" || exit 1
+exit 0

@@ -1,0 +1,131 @@
+
+# This file is a part of __PROGRAM_NAME__ __PROGRAM_VERSION__
+#
+# This file installs __PROGRAM_NAME__ in the operating system, cleans
+# temporary files and directory in the project.
+#
+# __PROGRAM_COPYRIGHT__ __PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Names section
+
+PROG = __PROGRAM_NAME__
+
+TARGET_README = README
+TARGET_NEWS = NEWS
+TARGET_LICENSE = LICENSE
+TARGET_PROG_DIR = $(PROG)
+
+
+# Build section
+
+M4CMD = m4 -P
+M4DIR = m4
+
+SELF = Makefile
+
+SRC_TEMPLATE_DIR = src_template
+
+SRC_TESTS_DIR = tests
+
+build_dir = build
+BUILD_DIR = $(build_dir)
+
+BUILD_TESTS_DIR = tests
+
+BUILD_DOCS_DIR = docs
+
+VERSION_M4 = $(M4DIR)/version.m4
+
+SRC_PROG_PY = $(PROG).py
+
+
+# Tests
+
+PYTESTCMD = pytest -vv
+
+T_SRC_TEST_PROG_PY = test_$(PROG).py
+T_SRC_INIT_PY = __init__.py
+
+
+# Install section
+
+DST_PROG_NO_PY = $(PROG)
+
+prog_dir = /usr/local/bin
+docs_dir = /usr/share/doc
+
+PROG_INSTALL_DIR = $(prog_dir)
+DOCS_INSTALL_DIR = $(docs_dir)/$(PROG)
+
+
+# Commands
+
+all: build
+
+help:
+	@echo "usage: make [ clean | install | uninstall | tests ]"
+
+build:
+	@[ -d $(BUILD_DIR) ] $&& rm -rf $(BUILD_DIR)
+	@mkdir $(BUILD_DIR)
+
+	@mkdir $(BUILD_DIR)/$(BUILD_DOCS_DIR)
+	@$(M4CMD) $(VERSION_M4) $(TARGET_README) > $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_README)
+	@$(M4CMD) $(VERSION_M4) $(TARGET_NEWS) > $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_NEWS)
+	@cp $(TARGET_LICENSE) $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_LICENSE)
+
+	@$(M4CMD) $(VERSION_M4) $(SRC_TEMPLATE_DIR)/$(SRC_PROG_PY) > $(BUILD_DIR)/$(SRC_PROG_PY)
+
+	@mkdir $(BUILD_DIR)/$(BUILD_TESTS_DIR)
+	@$(M4CMD) $(VERSION_M4) $(SRC_TEMPLATE_DIR)/$(SRC_TESTS_DIR)/$(T_SRC_TEST_PROG_PY) > $(BUILD_DIR)/$(BUILD_TESTS_DIR)/$(T_SRC_TEST_PROG_PY)
+	@$(M4CMD) $(VERSION_M4) $(SRC_TEMPLATE_DIR)/$(SRC_TESTS_DIR)/$(T_SRC_INIT_PY) > $(BUILD_DIR)/$(BUILD_TESTS_DIR)/$(T_SRC_INIT_PY)
+
+	@echo "$(PROG) has built in the \`$(BUILD_DIR)' directory."
+
+clean:
+	@rm -rf $(BUILD_DIR)
+	@rm -f $(SELF)
+
+	@echo "$(PROG) has cleaned."
+
+install:
+	@[ -d $(BUILD_DIR) ] || { \
+            echo "error: Build directory not found." 1>&2;\
+            echo "error: Should to run \`make' first." 1>&2;\
+            exit 1;\
+        }
+
+	install -d $(DOCS_INSTALL_DIR)
+	install -m 644 $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_README) $(DOCS_INSTALL_DIR)/$(TARGET_README)
+	install -m 644 $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_NEWS) $(DOCS_INSTALL_DIR)/$(TARGET_NEWS)
+	install -m 644 $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_LICENSE) $(DOCS_INSTALL_DIR)/$(TARGET_LICENSE)
+
+	install -d $(PROG_INSTALL_DIR)
+	install -m 755 $(BUILD_DIR)/$(SRC_PROG_PY) $(PROG_INSTALL_DIR)/$(DST_PROG_NO_PY)
+
+	@echo "$(PROG) has installed."
+
+uninstall:
+	rm -rf $(PROG_INSTALL_DIR)/$(DST_PROG_NO_PY)
+	rm -rf $(DOCS_INSTALL_DIR)
+
+	@echo "$(PROG) has uninstalled."
+
+tests:
+	$(PYTESTCMD) $(BUILD_DIR)/$(SRC_TESTS_DIR)
+
+.PHONY: all help build clean install uninstall tests

@@ -1,4 +1,4 @@
-__PROGRAM_NAME__ __PROGRAM_VERSION__ - jumping loader
+julo v0.0.0 - jumping loader
 
 Loads online videos from sites which require serveral transitions from
 one site page to another before video becomes available.
