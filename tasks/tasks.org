@@ -3,7 +3,7 @@
 #+TODO: BUG(b!) | FIXED(f) REJECT(r)
 #+PRIORITIES: A F C
 #+TAGS: current(c) testing(t)
-#+CONSTANTS: last_issue_id=17
+#+CONSTANTS: last_issue_id=18
 
 * Задачи
   :PROPERTIES:
@@ -88,6 +88,18 @@
    :issue_id: 10
    :issue_type: task
    :END:
+
+** TASK Вывести сообщение при отсутствии файла настроек
+   :PROPERTIES:
+   :issue_id: 18
+   :issue_type: task
+   :END:
+
+   [2025-06-06 Пт 23:46]
+
+   Когда запускаешь программу в директории, в которой нет файла
+   настроек, порождается непонятное исключение. Надо сделать так,
+   чтобы выводилось сообщение об отсутствии файла и подсказка.
 
 
 * Баги
