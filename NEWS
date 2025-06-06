@@ -12,18 +12,21 @@ Changed
 
 Fixed
 
-[0.1.0] - 2012-11-15
+[1.2.0] - 2025-06-03
 
 Added
+- Load command for temporary urls
+
+[1.1.1] - 2025-05-29
 
 Changed
+- Replaced command line split function
 
-Fixed
+[1.1.0] - 2025-05-25
+
+Added
+- Load command for direct url
+
+[1.0.0] - 2012-11-15
 
 [0.0.0] - 2012-11-15
-
-Added
-
-Changed
-
-Fixed
