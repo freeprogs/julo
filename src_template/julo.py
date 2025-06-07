@@ -30,7 +30,7 @@
 __version__ = '__PROGRAM_VERSION_NO_V__'
 __date__ = '__PROGRAM_UPDATE_DATE__'
 __author__ = '__PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__'
-__license__ = 'GNU GPLv3'
+__license__ = '__PROGRAM_LICENSE__'
 
 # 15.11.2012
 
