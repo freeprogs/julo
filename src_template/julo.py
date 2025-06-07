@@ -663,6 +663,12 @@ if __name__ == '__main__':
         cfname = sys.argv[1]
     else:
         cfname = 'julo.xml'
+    if not os.path.exists(cfname):
+        print(
+            'Config file is not found: {}'.format(cfname),
+            file=sys.stderr
+        )
+        sys.exit(1)
     cfh = ConfigFileHandler(cfname)
     cfh.load_config()
     assert cfh.getname()
