@@ -12,6 +12,11 @@ Changed
 
 Fixed
 
+[1.2.1] - 2025-06-07
+
+Changed
+- Add a check for config file
+
 [1.2.0] - 2025-06-03
 
 Added
