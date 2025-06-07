@@ -673,7 +673,7 @@ if __name__ == '__main__':
         sys.exit(1)
     cfh = ConfigFileHandler(cfname)
     cfh.load_config()
-    assert cfh.getname()
+    assert cfh.getname(), 'The site name is empty'
     print('Load config...', cfh.getname())
     ufname, marker, rmarker = cfh.geturls()
     nname, nload, ncomp = cfh.getnotice()
