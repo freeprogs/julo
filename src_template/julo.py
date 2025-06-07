@@ -225,7 +225,9 @@ class FilesDownloader:
                 tmpph.start()
                 dirurl = tmpph.get_string()
                 tmpph.end()
-            assert dirurl,  'expected the direct url'
+            if not dirurl:
+                print('Direct url is not found')
+                return
             dh = DownloadHandler(loadcmd,
                                  dirurl,
                                  (tmppref, tmpsuf, page, tmphlen),
