@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Сделать Makefile
+** DONE Сделать Makefile
+   CLOSED: [2025-06-14 Сб 10:34]
    :PROPERTIES:
    :issue_id: 16
    :issue_type: task
