@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Сделать лог версий в NEWS
+** DONE Сделать лог версий в NEWS
+   CLOSED: [2025-06-14 Сб 10:33]
    :PROPERTIES:
    :issue_id: 15
    :issue_type: task
