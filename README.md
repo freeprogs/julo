@@ -1,3 +1,65 @@
+# julo
+
+jumping loader
+
+Loads online videos from sites which require several transitions from
+one site page to another before video becomes available.
+
+---
+
+### Requirements
+
+
+This program has tested on environment configuration
+```
+  Linux Fedora 39
+  Python 3.12.0
+  GNU bash 5.2.15
+  curl 8.2.1
+  yt-dlp 2025.06.09
+```
+
+### Building
+
+Build the docs and read the README file in _build/docs_.
+
+To build run:
+
+```sh
+$ ./configure
+$ make
+```
+
+### Installation
+
+To install run:
+
+```sh
+$ sudo make install
+```
+
+To uninstall run:
+
+```sh
+$ sudo make uninstall
+```
+
+### Set program config
+
+Read examples in __man 5 julo__ .
+
+### Run
+
+Make the config file __julo.xml__ in the directory. Make the urls file in the directory. In the urls file mark urls you want to download.
+
+After that in this directory run:
+
+```sh
+$ julo
+```
+
+---
+
 julo v1.2.1 - jumping loader
 
 Loads online videos from sites which require serveral transitions from
