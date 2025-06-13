@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Создать репозиторий
+** DONE Создать репозиторий
+   CLOSED: [2025-06-14 Сб 10:35]
    :PROPERTIES:
    :issue_id: 17
    :issue_type: task
