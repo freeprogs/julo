@@ -29,11 +29,17 @@ TARGET_NEWS = NEWS
 TARGET_LICENSE = LICENSE
 TARGET_PROG_DIR = $(PROG)
 
+TARGET_MAN_BIN = $(PROG).1
+TARGET_MAN_CONFIG = $(PROG).5
+
 
 # Build section
 
 M4CMD = m4 -P
 M4DIR = m4
+
+GZIPCMD = gzip
+GZIP_EXT = .gz
 
 SELF = Makefile
 
@@ -47,6 +53,9 @@ BUILD_DIR = $(build_dir)
 BUILD_TESTS_DIR = tests
 
 BUILD_DOCS_DIR = docs
+
+man_dir = man
+MAN_DIR = $(man_dir)
 
 VERSION_M4 = $(M4DIR)/version.m4
 
@@ -67,9 +76,13 @@ DST_PROG_NO_PY = $(PROG)
 
 prog_dir = /usr/local/bin
 docs_dir = /usr/share/doc
+system_man_bin_dir = /usr/share/man/man1
+system_man_config_dir = /usr/share/man/man5
 
 PROG_INSTALL_DIR = $(prog_dir)
 DOCS_INSTALL_DIR = $(docs_dir)/$(PROG)
+MAN_BIN_INSTALL_DIR = $(system_man_bin_dir)
+MAN_CONFIG_INSTALL_DIR = $(system_man_config_dir)
 
 
 # Commands
@@ -82,6 +95,12 @@ help:
 build:
 	@[ -d $(BUILD_DIR) ] $&& rm -rf $(BUILD_DIR)
 	@mkdir $(BUILD_DIR)
+
+	@mkdir $(BUILD_DIR)/$(MAN_DIR)
+	@$(M4CMD) $(VERSION_M4) $(SRC_TEMPLATE_DIR)/$(TARGET_MAN_BIN) > $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_BIN)
+	@$(GZIPCMD) $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_BIN)
+	@$(M4CMD) $(VERSION_M4) $(SRC_TEMPLATE_DIR)/$(TARGET_MAN_CONFIG) > $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_CONFIG)
+	@$(GZIPCMD) $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_CONFIG)
 
 	@mkdir $(BUILD_DIR)/$(BUILD_DOCS_DIR)
 	@$(M4CMD) $(VERSION_M4) $(TARGET_README) > $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_README)
@@ -109,6 +128,10 @@ install:
             exit 1;\
         }
 
+	install -d $(MAN_BIN_INSTALL_DIR)
+	install -m 644 $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_BIN)$(GZIP_EXT) $(MAN_BIN_INSTALL_DIR)
+	install -m 644 $(BUILD_DIR)/$(MAN_DIR)/$(TARGET_MAN_CONFIG)$(GZIP_EXT) $(MAN_CONFIG_INSTALL_DIR)
+
 	install -d $(DOCS_INSTALL_DIR)
 	install -m 644 $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_README) $(DOCS_INSTALL_DIR)/$(TARGET_README)
 	install -m 644 $(BUILD_DIR)/$(BUILD_DOCS_DIR)/$(TARGET_NEWS) $(DOCS_INSTALL_DIR)/$(TARGET_NEWS)
@@ -122,6 +145,8 @@ install:
 uninstall:
 	rm -r $(PROG_INSTALL_DIR)/$(DST_PROG_NO_PY)
 	rm -rf $(DOCS_INSTALL_DIR)
+	rm -f $(MAN_BIN_INSTALL_DIR)/$(TARGET_MAN_BIN)$(GZIP_EXT)
+	rm -f $(MAN_CONFIG_INSTALL_DIR)/$(TARGET_MAN_CONFIG)$(GZIP_EXT)
 
 	@echo "$(PROG) has uninstalled."
 

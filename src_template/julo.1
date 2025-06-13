@@ -1,0 +1,57 @@
+.\"
+.\" This manpage is a part of __PROGRAM_NAME__ __PROGRAM_VERSION__
+.\"
+.\" __PROGRAM_COPYRIGHT__ __PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__
+.\"
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+
+.TH __PROGRAM_NAME__ "1" "__PROGRAM_DATE__" "__PROGRAM_NAME__ __PROGRAM_VERSION__" "User Commands"
+
+.SH NAME
+
+__PROGRAM_NAME__ \- start from a top url, jump to a direct url and load the file.
+
+.SH SYNOPSIS
+
+.B __PROGRAM_NAME__
+[ \fBconfig\fR ]
+
+.SH DESCRIPTION
+
+.PP
+
+The program searches in the current directory for the config file, takes settings for the site from the config file and starts searching the site contents for the direct url to the target file. After the program makes several jumps to internal site pages (if any) the direct url to the target file is found and the program starts to download the target file. The target file is loading to the temporary file with a unique name and may be resumed in another download session. After the file has been downloaded, it is renamed to the ready name with a number in order and a message is displayed to the desktop. Also the file url is marked as downloaded when the file has been downloaded. See details how to make the config file in the detailed man page (run \fBman 5 __PROGRAM_NAME__\fR).
+
+The default config file is __PROGRAM_NAME__.xml .
+
+.SH AUTHOR
+
+Written by __PROGRAM_AUTHOR__
+
+.SH "REPORTING BUGS"
+
+Report bugs and feature requests to
+.br
+__PROGRAM_AUTHOR_EMAIL__
+
+.SH COPYRIGHT
+
+__PROGRAM_COPYRIGHT__ __PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__
+.br
+__PROGRAM_LICENSE__
+
+.SH "SEE ALSO"
+
+.BR __PROGRAM_NAME__ (5)

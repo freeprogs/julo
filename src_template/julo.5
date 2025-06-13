@@ -1,0 +1,187 @@
+.\"
+.\" This manpage is a part of __PROGRAM_NAME__ __PROGRAM_VERSION__
+.\"
+.\" __PROGRAM_COPYRIGHT__ __PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__
+.\"
+.\" This program is free software: you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program.  If not, see <http://www.gnu.org/licenses/>.
+.\"
+
+.TH __PROGRAM_NAME__ "1" "__PROGRAM_DATE__" "__PROGRAM_NAME__ __PROGRAM_VERSION__" "User Commands"
+
+.SH NAME
+
+__PROGRAM_NAME__ \- start from a top url, jump to a direct url and load the file.
+
+.SH SYNOPSIS
+
+.B __PROGRAM_NAME__
+[ \fBconfig\fR ]
+
+.SH DESCRIPTION
+
+.PP
+
+Read the config file, take urls from the urls file and jump to the internal site pages to get the direct url to a file. Then download the file by its direct url.
+
+.PP
+
+The default config file is __PROGRAM_NAME__.xml .
+
+Here is the config file structure:
+
+.nf
+    <?xml version="1.0" encoding="utf-8"?>
+    <site name="">
+      <urls file="" search="" replace="" />
+      <notice name="" one="" all="" />
+      <patterns>
+        <pattern load=""
+                 start=""
+                 left=""
+                 right="" />
+        <pattern load=""
+                 start=""
+                 left=""
+                 right="" />
+        
+        ...
+        
+      </patterns>
+      <load cmd="" />
+      <temp prefix="" suffix="" random="" />
+      <final prefix="" suffix="" />
+    </site>
+.fi
+
+Fields:
+
+    site name     -- which name to display in the console
+    urls file     -- name of file with top urls
+    urls search   -- marker for urls in the urls file marked for download
+    urls replace  -- marker in the urls file for downloaded urls
+    notice name   -- which name to display in the displayed download notice
+    notice one    -- which message to display in the displayed download notice
+                     when one file has been complete
+    notice all    -- which message to display in the displayed download notice
+                     when all files have been complete
+    pattern load  -- which command for loading the page to run
+                     with %url argument
+    pattern start -- which regexp should match in the loaded page
+                     for start searching the url in the page
+    pattern left  -- which regexp should match in the loaded page
+                     at the left side of the url
+    pattern right -- which regexp should match in the loaded page
+                     at the right side of the url
+    load cmd      -- which command for loading the target file
+                     with %url and %file arguments
+    temp prefix   -- which prefix to use in the temporary file name
+    temp suffix   -- which suffix to use in the temporary file name
+    temp random   -- the length of the random hexadecimal number
+                     in the temporary file name
+                     unique and constant for the according target url
+    final prefix  -- which prefix to use in the complete file name
+    final suffix  -- which suffix to use in the complete file name
+
+Example:
+
+.nf
+
+    File julo.xml:
+    
+    <?xml version="1.0" encoding="utf-8"?>
+    <site name="Site With Videos">
+      <urls file="urls.txt" search="*" replace="[" />
+      <notice name="SWV" one="loaded" all="complete" />
+      <patterns>
+        <pattern load="curl %url"
+                 start="Press download button..."
+                 left="&lt;a href=&quot;"
+                 right="&quot; class" />
+      </patterns>
+      <temp prefix="tmp_" suffix=".mp4" random="8" />
+      <final prefix="file" suffix=".mp4" />
+      <load cmd="curl %url -o %file" />
+    </site>
+
+    File urls.txt:
+
+    *https://www.sitewithvideos.com/some-interesting-topic1.html
+    *https://www.sitewithvideos.com/some-interesting-topic2.html
+    *https://www.sitewithvideos.com/some-interesting-topic3.html
+
+.fi
+
+With these settings the program will display "Site With Videos" to the user in the console. Then the program will start search in the file "urls.txt" for urls starting from the "*" character. And then the url will be downloaded by the command "curl\ %url" where the page url will be substituted to the "%url" template point and the downloaded resulting page will be searched for the start string "Press download button...". If the start string is found, then the page text after the start string will be searched for the left pattern '<a\ href="' which is starting the target url and '"\ class' for the right pattern which is ending the target url. Then the target url will be found and downloaded by the command "curl %url -o %file" where the target url will be substituted to the "%url" template point and the output file name will be substituted to the "%file" template point. The target file will download to the temporary name "tmp_abcd0102.mp4" and when the download of the target file will be completed the temporary file will be renamed from "tmp_abcd0102.mp4" to "file1.mp4". Then in the "urls.txt" the top url will be marked from "*" character to the "[" character and the notice will be displayed to the user as "SWV: loaded". If no any top urls are marked in the file "urls.txt" for download by the "*" character, then the notice will be displayed to the user as "SWV: complete" also.
+
+.SH "SOME EXAMPLES"
+
+Example of the YouTube configuration:
+
+.nf
+
+File julo.xml:
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <site name="YouTube">
+      <urls file="urls" search="*" replace="[" />
+      <notice name="YouTube" one="one loaded" all="all loaded" />
+      <patterns />
+      <load cmd="yt-dlp -c --proxy socks5://localhost:1080 %url -o %file" />
+      <temp prefix="yt_tmp_" suffix=".mp4" random="8" />
+      <final prefix="yt_vid_" suffix=".mp4" />
+    </site>
+
+File urls.txt:
+
+    YouTube urls
+    
+    Cat plays
+    [https://www.youtube.com/watch?v=wJHnone1JiU
+    Driving a car
+    *https://www.youtube.com/watch?v=wJHnone2JiU
+    Some song
+    [https://www.youtube.com/watch?v=wJHnone3JiU
+    A lesson
+    *https://www.youtube.com/watch?v=wJHnone4JiU
+
+Output files:
+
+    yt_vid_1.mp4
+    yt_vid_2.mp4
+    yt_vid_3.mp4
+    yt_vid_4.mp4
+
+.fi
+
+Here you see how to load videos from YouTube by the program yt-dlp and some tricks within the command line without jumps by patterns for pages.
+
+.SH AUTHOR
+
+Written by __PROGRAM_AUTHOR__
+
+.SH "REPORTING BUGS"
+
+Report bugs and feature requests to
+.br
+__PROGRAM_AUTHOR_EMAIL__
+
+.SH COPYRIGHT
+
+__PROGRAM_COPYRIGHT__ __PROGRAM_AUTHOR__ __PROGRAM_AUTHOR_EMAIL__
+.br
+__PROGRAM_LICENSE__
+
+.SH "SEE ALSO"
+
+.BR __PROGRAM_NAME__ (5)
