@@ -212,15 +212,6 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** DONE Придумать более конкретное название программы
-   CLOSED: [2025-06-14 Сб 10:28]
-   :PROPERTIES:
-   :issue_id: 13
-   :issue_type: task
-   :END:
-
-   [2025-06-07 Сб 21:04]
-
 ** TASK Сделать подходящий для общего пользования README
    :PROPERTIES:
    :issue_id: 14

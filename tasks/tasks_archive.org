@@ -1,0 +1,21 @@
+#+STARTUP: content logdone hideblocks
+#+TODO: TASK(t!) | DONE(d) CANCEL(c)
+#+TODO: BUG(b!) | FIXED(f) REJECT(r)
+#+PRIORITIES: A F C
+#+TAGS: current(c) testing(t)
+
+* Архив окружения
+
+** DONE Придумать более конкретное название программы
+   CLOSED: [2025-06-14 Сб 10:28]
+   :PROPERTIES:
+   :issue_id: 13
+   :issue_type: task
+   :ARCHIVE_TIME: 2025-06-14 Сб 10:29
+   :ARCHIVE_FILE: ~/prog/projects/python/julo/julo/tasks/tasks.org
+   :ARCHIVE_OLPATH: Окружение
+   :ARCHIVE_CATEGORY: tasks
+   :ARCHIVE_TODO: DONE
+   :END:
+
+   [2025-06-07 Сб 21:04]
