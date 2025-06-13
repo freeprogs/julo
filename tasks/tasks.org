@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Придумать более конкретное название программы
+** DONE Придумать более конкретное название программы
+   CLOSED: [2025-06-14 Сб 10:28]
    :PROPERTIES:
    :issue_id: 13
    :issue_type: task
