@@ -34,3 +34,16 @@
 
    [2025-06-07 Сб 21:04]
 
+** DONE Сделать лог версий в NEWS
+   CLOSED: [2025-06-14 Сб 10:33]
+   :PROPERTIES:
+   :issue_id: 15
+   :issue_type: task
+   :ARCHIVE_TIME: 2025-06-14 Сб 10:33
+   :ARCHIVE_FILE: ~/prog/projects/python/julo/julo/tasks/tasks.org
+   :ARCHIVE_OLPATH: Окружение
+   :ARCHIVE_CATEGORY: tasks
+   :ARCHIVE_TODO: DONE
+   :END:
+
+   [2025-06-07 Сб 21:04]
