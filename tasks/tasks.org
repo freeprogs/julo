@@ -212,15 +212,6 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** DONE Сделать подходящий для общего пользования README
-   CLOSED: [2025-06-14 Сб 10:31]
-   :PROPERTIES:
-   :issue_id: 14
-   :issue_type: task
-   :END:
-
-   [2025-06-07 Сб 21:04]
-
 ** TASK Сделать лог версий в NEWS
    :PROPERTIES:
    :issue_id: 15
