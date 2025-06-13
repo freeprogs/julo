@@ -120,7 +120,7 @@ install:
 	@echo "$(PROG) has installed."
 
 uninstall:
-	rm -rf $(PROG_INSTALL_DIR)/$(DST_PROG_NO_PY)
+	rm -r $(PROG_INSTALL_DIR)/$(DST_PROG_NO_PY)
 	rm -rf $(DOCS_INSTALL_DIR)
 
 	@echo "$(PROG) has uninstalled."
