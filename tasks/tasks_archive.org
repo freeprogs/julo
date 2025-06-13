@@ -62,3 +62,17 @@
 
    [2025-06-07 Сб 21:04]
 
+** DONE Создать репозиторий
+   CLOSED: [2025-06-14 Сб 10:35]
+   :PROPERTIES:
+   :issue_id: 17
+   :issue_type: task
+   :ARCHIVE_TIME: 2025-06-14 Сб 10:36
+   :ARCHIVE_FILE: ~/prog/projects/python/julo/julo/tasks/tasks.org
+   :ARCHIVE_OLPATH: Окружение
+   :ARCHIVE_CATEGORY: tasks
+   :ARCHIVE_TODO: DONE
+   :END:
+
+   [2025-06-07 Сб 21:04]
+
