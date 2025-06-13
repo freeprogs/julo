@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Сделать подходящий для общего пользования README
+** DONE Сделать подходящий для общего пользования README
+   CLOSED: [2025-06-14 Сб 10:31]
    :PROPERTIES:
    :issue_id: 14
    :issue_type: task
