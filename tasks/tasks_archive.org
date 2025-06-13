@@ -47,3 +47,18 @@
    :END:
 
    [2025-06-07 Сб 21:04]
+
+** DONE Сделать Makefile
+   CLOSED: [2025-06-14 Сб 10:34]
+   :PROPERTIES:
+   :issue_id: 16
+   :issue_type: task
+   :ARCHIVE_TIME: 2025-06-14 Сб 10:35
+   :ARCHIVE_FILE: ~/prog/projects/python/julo/julo/tasks/tasks.org
+   :ARCHIVE_OLPATH: Окружение
+   :ARCHIVE_CATEGORY: tasks
+   :ARCHIVE_TODO: DONE
+   :END:
+
+   [2025-06-07 Сб 21:04]
+
