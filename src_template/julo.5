@@ -169,6 +169,50 @@ Output files:
 
 Here you see how to load videos from YouTube by the program yt-dlp and some tricks within the command line without jumps by patterns for pages.
 
+.B
+Example 2
+
+Download from Python PEP configuration:
+
+.nf
+
+File julo.xml:
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <site name="Python PEPs">
+      <urls file="urls" search="*" replace="[" />
+      <notice name="PEP" one="loaded" all="complete" />
+      <patterns>
+        <pattern load="wget %url -O -"
+                 start="&lt;p&gt;Source:"
+                 left="&lt;a class=&quot;reference external&quot; href=&quot;"
+                 right="&quot;&gt;https://github.com" />
+        <pattern load="wget %url -O -"
+                 start="\{&quot;payload&quot;:\{"
+                 left="&quot;displayUrl&quot;:&quot;"
+                 right="&quot;,&quot;headerInfo&quot;" />
+      </patterns>
+      <load cmd="wget %url -O %file" />
+      <temp prefix="tmp" suffix=".rst" random="8" />
+      <final prefix="pep" suffix=".rst" />
+    </site>
+
+File urls:
+
+    *https://peps.python.org/pep-0001/
+    *https://peps.python.org/pep-0002/
+    *https://peps.python.org/pep-0008/
+
+Output files:
+
+    pep1.rst
+    pep2.rst
+    pep3.rst
+
+.fi
+
+Here you see how to load RST-files for Python PEPs with two jumps. The first jump takes a url on the Python site to the Python GitHub-account where the RST-file is placed and goes there. Then the second jump takes a url on the Python GitHub-account page to the raw RST-file and goes there. The final url is the url that should be loaded. So for top Python PEP url the program downloads its according RST-file from the Python GitHub account. To download pages and the final file the program uses program wget.
+
 .SH AUTHOR
 
 Written by __PROGRAM_AUTHOR__
