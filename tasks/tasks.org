@@ -212,7 +212,8 @@
   :ARCHIVE:  tasks_archive.org::* Архив окружения
   :END:
 
-** TASK Создать страницу man
+** DONE Создать страницу man
+   CLOSED: [2025-06-16 Пн 13:16]
    :PROPERTIES:
    :issue_id: 20
    :issue_type: task
