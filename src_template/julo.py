@@ -17,14 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Загрузчик файлов, управляемый файлом, содержащим
-маркированные ссылки.
+"""Загрузчик файлов, управляемый файлом, содержащим маркированные
+ссылки.
 
 Все отмеченные маркером ссылки загружаются по очереди.
-Если файл по ссылке не докачан, то он сохраняется под своим
-временным именем. Если файл докачан, то он сохраняется после
-последнего из существующих в каталоге под следующим номером.
-Когда файл скачан, пользователь уведомляется всплывающим сообщением.
+Если файл по ссылке не докачан, то он сохраняется под своим временным
+именем. Если файл докачан, то он сохраняется после последнего из
+существующих в каталоге под следующим номером. Если после ссылки
+задано имя файла, то файл сохраняется под заданным именем. Когда файл
+скачан, пользователь уведомляется об этом всплывающим сообщением.
 """
 
 __version__ = '__PROGRAM_VERSION_NO_V__'
@@ -68,7 +69,7 @@ class ConfigFileHandler:
                 self._dct[tag] = att['name']
             if tag == 'urls':
                 self._dct[tag] = (att['file'], att['search'],
-                                  att['replace'])
+                                  att['replace'], att['namesep'])
             elif tag == 'notice':
                 self._dct[tag] = (att['name'], att['one'],
                                   att['all'])
@@ -93,8 +94,8 @@ class ConfigFileHandler:
 
     def geturls(self):
         #дано    :
-        #получить: ссылки (файл, маркер, маркер замены)
-        """Ссылки (файл, маркер, маркер замены)."""
+        #получить: ссылки (файл, маркер, маркер замены, разделитель имени)
+        """Ссылки (файл, маркер, маркер замены, разделитель имени)."""
         return self._dct['urls']
 
     def getnotice(self):
@@ -138,7 +139,7 @@ class ConfigFileHandler:
 class FilesDownloader:
     """Загрузчик файлов по файлу с маркированными ссылками."""
     def __init__(self,
-                 urlsfname, marker, rmarker,
+                 urlsfname, marker, rmarker, namesep,
                  notname, notmsg_load, notmsg_comp,
                  patterns,
                  loadcmd,
@@ -148,6 +149,7 @@ class FilesDownloader:
         urlsfname      файл с маркированными ссылками
         marker         маркер в начале ссылки
         rmarker        маркер замены
+        namesep        разделитель имени
         notifymsg      сообщение для уведомления
         notname        название уведомителя
         notmsg_load    сообщение для уведомления о загрузке
@@ -165,7 +167,7 @@ class FilesDownloader:
         nxtsuf         суффикс постоянного файла
 
         пример:
-        FilesDownloader('urls', '*', '[',
+        FilesDownloader('urls', '*', '[', ' ',
                         'partv', 'loaded', 'complete',
                         [('curl %url', r'Скачать', r'<a href=.', r'. class'),
                          ('curl %url', r'Скачать', r'<a href=.', r'. class')],
@@ -176,6 +178,7 @@ class FilesDownloader:
         self._urlsfname = urlsfname
         self._marker = marker
         self._rmarker = rmarker
+        self._namesep = namesep
         self._notname = notname
         self._notmsg_load = notmsg_load
         self._notmsg_comp = notmsg_comp
@@ -192,13 +195,14 @@ class FilesDownloader:
         #получить: по ссылкам с маркером из файла загружены
         #          файлы, загруженные ссылки отмечены другим
         #          маркером
-        """Загрузить файлы по маркированным ссылкам из файла,
-        сохраняя их под временными или постоянными именами (в
-        зависимости от закачанности) и помечая загруженные
-        ссылки другим маркером."""
+        """Загрузить файлы по маркированным ссылкам из файла, сохраняя
+        их под временными, постоянными или фиксированными именами (в
+        зависимости от закачанности) и помечая загруженные ссылки
+        другим маркером."""
         urlsfname = self._urlsfname
         marker = self._marker
         rmarker = self._rmarker
+        namesep = self._namesep
         notname = self._notname
         notmsg_load = self._notmsg_load
         notmsg_comp = self._notmsg_comp
@@ -210,8 +214,10 @@ class FilesDownloader:
         nxtpref = self._nxtpref
         nxtsuf = self._nxtsuf
 
-        ufh = UrlsFileHandler(urlsfname, marker, rmarker)
-        page = ufh.read_line()
+        ufh = UrlsFileHandler(urlsfname, marker, rmarker, namesep)
+        url_line = ufh.read_line()
+        page = ufh.get_url(url_line)
+        fxdname = ufh.get_file(url_line)
         if page:
             print('Start download')
         else:
@@ -231,7 +237,8 @@ class FilesDownloader:
             dh = DownloadHandler(loadcmd,
                                  dirurl,
                                  (tmppref, tmpsuf, page, tmphlen),
-                                 (nxtpref, nxtsuf))
+                                 (nxtpref, nxtsuf),
+                                 fxdname)
             dh.start()
             dh.download()
             if dh.iscomplete():
@@ -241,25 +248,30 @@ class FilesDownloader:
             else:
                 dh.end()
                 break
-            page = ufh.read_line()
+            url_line = ufh.read_line()
+            page = ufh.get_url(url_line)
+            fxdname = ufh.get_file(url_line)
         if page is None:
             nh.notify(notmsg_comp)
 
 class UrlsFileHandler:
-    """Обработчик файла, который может отыскивать маркированные строки
-    и маркировать их другим маркером."""
-    def __init__(self, fname, marker, rmarker):
+    """Обработчик файла, который может отыскивать маркированные
+    строки, маркировать их другим маркером, а также брать
+    фиксированное имя файла, если задан разделитель имени файла."""
+    def __init__(self, fname, marker, rmarker, namesep):
         """
         fname      имя файла с маркированными строками
         marker     маркер строки
         rmarker    маркер замены
+        namesep    разделитель имени
 
         пример:
-        UrlsFileHandler('urls', '*', '[')
+        UrlsFileHandler('urls', '*', '[', ' ')
         """
         self._fname = fname
         self._marker = marker
         self._rmarker = rmarker
+        self._namesep = namesep
 
     def read_line(self):
         #дано    :
@@ -271,6 +283,30 @@ class UrlsFileHandler:
             for line in fin:
                 if line.startswith(marker):
                     return line[len(marker):].strip()
+
+    def get_url(self, string):
+        #дано    : строка из файла со ссылками
+        #получить: возвращается ссылка из первой строки, начинающейся
+        #          с маркера (маркер удаляется)
+        """Взять ссылку из строки файла."""
+        if string:
+            pos = string.find(self._namesep)
+            if pos >= 0:
+                return string[:pos]
+            else:
+                return string
+        return None
+
+    def get_file(self, string):
+        #дано    : строка из файла со ссылками
+        #получить: возвращается фиксированное имя файла из первой строки,
+        #          начинающейся с маркера, если это имя задано
+        """Взять фиксированное имя файла из строки файла."""
+        if string:
+            pos = string.find(self._namesep)
+            if pos >= 0:
+                return string[pos+len(self._namesep):]
+        return None
 
     def replace_line(self, s):
         #дано    : задана строка для замены
@@ -284,7 +320,7 @@ class UrlsFileHandler:
             for line in fin:
                 line = line.rstrip()
                 if line.startswith(marker) and \
-                   line[len(marker):] == s:
+                   line[len(marker):].startswith(s):
                    print('{0}{1}'.format(rmarker, line[len(marker):]),
                          file=fout)
                 else:
@@ -405,7 +441,7 @@ class PageCmdlineLoader:
 
 class DownloadHandler:
     """Обработчик для закачивания и сохранения файла."""
-    def __init__(self, loadcmd, baseurl, tmpnameinfo, nxtnameinfo):
+    def __init__(self, loadcmd, baseurl, tmpnameinfo, nxtnameinfo, fxdnameinfo):
         """
         loadcmd        команда с аргументами для скачивания
                        "prog %url -o %file"
@@ -414,18 +450,22 @@ class DownloadHandler:
                        (prefix, suffix, string, hashlen)
         nxtnameinfo    информация для постоянного имени файла
                        (prefix, suffix)
+        fxdnameinfo    информация для фиксированного имени файла
+                       filename or None
 
         пример:
         DownloadHandler('curl %url -o %file',
                         'http://file',
                         ('tmp', '.mp4', 'string', 8),
-                        ('nxt', '.mp4'))
+                        ('nxt', '.mp4'),
+                        'file12345.mp4')
 
         """
         self._loadcmd = loadcmd
         self._baseurl = baseurl
         self._tmpnameinfo = tmpnameinfo
         self._nxtnameinfo = nxtnameinfo
+        self._fxdnameinfo = fxdnameinfo
 
     def start(self):
         #дано    :
@@ -436,19 +476,28 @@ class DownloadHandler:
     def download(self):
         #дано    :
         #получить: выполнена закачка файла;
-        #          если файл не докачан, то у него временное имя
-        #          если файл докачан, то у него имя по порядку
-        """Закачать файл и сохранить его под временным именем,
-        если файл не докачан, либо под именем по порядку, если файл
-        докачан."""
+        #          если файл не докачан, то у него временное имя;
+        #          если файл докачан и у него установлено фиксированное имя,
+        #          то у него устанавливается фиксированное имя;
+        #          если файл докачан и у него нет фиксированного имени,
+        #          то у него устанавливается имя по порядку
+        """Закачать файл и сохранить его под временным именем, если
+        файл не докачан, либо под фиксированным именем, если задано
+        фиксированное имя и файл докачан, либо под именем по порядку,
+        если фиксированное имя не задано и файл докачан."""
         tmppref, tmpsuf, s, hlen = self._tmpnameinfo
         nxtpref, nxtsuf = self._nxtnameinfo
+        fxdconfig = self._fxdnameinfo
         nh = NameHandler(s, hlen)
         tmpname = nh.get_tmp(tmppref, tmpsuf)
         nxtname = nh.get_next(nxtpref, nxtsuf)
+        fxdname = nh.get_fixed(fxdconfig)
         lh = LoadHandler(self._loadcmd, self._baseurl)
         if lh.download(tmpname):
-            os.rename(tmpname, nxtname)
+            if fxdname is None:
+                os.rename(tmpname, nxtname)
+            else:
+                os.rename(tmpname, fxdname)
             self._complete = True
 
     def iscomplete(self):
@@ -507,6 +556,16 @@ class NameHandler:
             n = max(int(pat.match(i).group(1)) for i in files)
             name = '{0}{1}{2}'.format(pref, n + 1, suf)
         return name
+
+    def get_fixed(self, string):
+        #дано    : задана строка с фиксированным именем
+        #получить: возвращается фиксированное имя файла или ничего
+        """Создать фиксированное имя файла, где фиксированное имя
+        равно строке, либо вернуть пустоту."""
+        if string:
+            return string
+        else:
+            return None
 
 class LoadHandler:
     """Загрузчик файла через команду общего вида."""
@@ -675,13 +734,13 @@ if __name__ == '__main__':
     cfh.load_config()
     assert cfh.getname(), 'The site name is empty'
     print('Load config...', cfh.getname())
-    ufname, marker, rmarker = cfh.geturls()
+    ufname, marker, rmarker, namesep = cfh.geturls()
     nname, nload, ncomp = cfh.getnotice()
     patterns = cfh.getpatterns()
     loadcmd = cfh.getload()
     tpref, tsuf, tlen = cfh.gettemp()
     npref, nsuf = cfh.getfinal()
-    fd = FilesDownloader(ufname, marker, rmarker,
+    fd = FilesDownloader(ufname, marker, rmarker, namesep,
                          nname, nload, ncomp,
                          patterns,
                          loadcmd,

@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <site name="">
-  <urls file="" search="" replace="" />
+  <urls file="" search="" replace="" namesep="" />
   <notice name="" one="" all="" />
   <patterns>
     <pattern load=""
