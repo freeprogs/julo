@@ -7,7 +7,7 @@ m4_define(__PROGRAM_DAY__, 15)m4_dnl
 m4_define(__PROGRAM_MONTH__, Nov)m4_dnl
 m4_define(__PROGRAM_YEAR__, 2012)m4_dnl
 m4_define(__PROGRAM_UPDATE_DAY__, 6)m4_dnl
-m4_define(__PROGRAM_UPDATE_MONTH__, Jun)m4_dnl
+m4_define(__PROGRAM_UPDATE_MONTH__, Jul)m4_dnl
 m4_define(__PROGRAM_UPDATE_YEAR__, 2025)m4_dnl
 m4_define(__PROGRAM_COPYRIGHT__, `Copyright (C) __PROGRAM_YEAR__-__PROGRAM_UPDATE_YEAR__')m4_dnl
 m4_define(__PROGRAM_LICENSE__, GNU GPLv3)m4_dnl
