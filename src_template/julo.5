@@ -43,7 +43,7 @@ Here is the config file structure:
 .nf
     <?xml version="1.0" encoding="utf-8"?>
     <site name="">
-      <urls file="" search="" replace="" />
+      <urls file="" search="" replace="" namesep="" />
       <notice name="" one="" all="" />
       <patterns>
         <pattern load=""
@@ -54,9 +54,9 @@ Here is the config file structure:
                  start=""
                  left=""
                  right="" />
-        
+
         ...
-        
+
       </patterns>
       <load cmd="" />
       <temp prefix="" suffix="" random="" />
@@ -70,6 +70,7 @@ Fields:
     urls file     -- name of file with top urls
     urls search   -- marker for urls in the urls file marked for download
     urls replace  -- marker in the urls file for downloaded urls
+    urls namesep  -- name separator for the fixed file name
     notice name   -- which name to display in the displayed download notice
     notice one    -- which message to display in the displayed download notice
                      when one file has been complete
@@ -97,11 +98,11 @@ Example:
 
 .nf
 
-    File julo.xml:
-    
+File julo.xml:
+
     <?xml version="1.0" encoding="utf-8"?>
     <site name="Site With Videos">
-      <urls file="urls.txt" search="*" replace="[" />
+      <urls file="urls.txt" search="*" replace="[" namesep=" " />
       <notice name="SWV" one="loaded" all="complete" />
       <patterns>
         <pattern load="curl %url"
@@ -114,11 +115,17 @@ Example:
       <load cmd="curl %url -o %file" />
     </site>
 
-    File urls.txt:
+File urls.txt:
 
     *https://www.sitewithvideos.com/some-interesting-topic1.html
     *https://www.sitewithvideos.com/some-interesting-topic2.html
     *https://www.sitewithvideos.com/some-interesting-topic3.html
+
+Output files:
+
+    file1.mp4
+    file2.mp4
+    file3.mp4
 
 .fi
 
@@ -137,7 +144,7 @@ File julo.xml:
 
     <?xml version="1.0" encoding="utf-8"?>
     <site name="YouTube">
-      <urls file="urls" search="*" replace="[" />
+      <urls file="urls" search="*" replace="[" namesep=" " />
       <notice name="YouTube" one="one loaded" all="all loaded" />
       <patterns />
       <load cmd="yt-dlp -c --proxy socks5://localhost:1080 %url -o %file" />
@@ -148,26 +155,26 @@ File julo.xml:
 File urls.txt:
 
     YouTube urls
-    
+
     Cat plays
-    [https://www.youtube.com/watch?v=wJHnone1JiU
+    *https://www.youtube.com/watch?v=wJHnone1JiU
     Driving a car
     *https://www.youtube.com/watch?v=wJHnone2JiU
     Some song
-    [https://www.youtube.com/watch?v=wJHnone3JiU
+    *https://www.youtube.com/watch?v=wJHnone3JiU
     A lesson
-    *https://www.youtube.com/watch?v=wJHnone4JiU
+    *https://www.youtube.com/watch?v=wJHnone4JiU lesson.mp4
 
 Output files:
 
     yt_vid_1.mp4
     yt_vid_2.mp4
     yt_vid_3.mp4
-    yt_vid_4.mp4
+    lesson.mp4
 
 .fi
 
-Here you see how to load videos from YouTube by the program yt-dlp and some tricks within the command line without jumps by patterns for pages.
+Here you see how to load videos from YouTube by the program yt-dlp and some tricks within the command line without jumps by patterns for pages. First three videos are saved by the order and the fourth video is saved by the fixed name.
 
 .B
 Example 2
@@ -180,7 +187,7 @@ File julo.xml:
 
     <?xml version="1.0" encoding="utf-8"?>
     <site name="Python PEPs">
-      <urls file="urls" search="*" replace="[" />
+      <urls file="urls" search="*" replace="[" namesep=" " />
       <notice name="PEP" one="loaded" all="complete" />
       <patterns>
         <pattern load="wget %url -O -"
@@ -199,19 +206,19 @@ File julo.xml:
 
 File urls:
 
-    *https://peps.python.org/pep-0001/
-    *https://peps.python.org/pep-0002/
-    *https://peps.python.org/pep-0008/
+    *https://peps.python.org/pep-0001/ pep001.rst
+    *https://peps.python.org/pep-0002/ pep002.rst
+    *https://peps.python.org/pep-0008/ pep008.rst
 
 Output files:
 
-    pep1.rst
-    pep2.rst
-    pep3.rst
+    pep001.rst
+    pep002.rst
+    pep008.rst
 
 .fi
 
-Here you see how to load RST-files for Python PEPs with two jumps. The first jump takes a url on the Python site to the Python GitHub-account where the RST-file is placed and goes there. Then the second jump takes a url on the Python GitHub-account page to the raw RST-file and goes there. The final url is the url that should be loaded. So for top Python PEP url the program downloads its according RST-file from the Python GitHub account. To download pages and the final file the program uses program wget.
+Here you see how to load RST-files for Python PEPs with two jumps. The first jump takes a url on the Python site to the Python GitHub-account where the RST-file is placed and goes there. Then the second jump takes a url on the Python GitHub-account page to the raw RST-file and goes there. The final url is the url that should be loaded. So for top Python PEP url the program downloads its according RST-file from the Python GitHub account. To download pages and the final file the program uses program wget. Also the names are assigned to the loaded files specially, because in the urls file the fixed names for files are set accordingly.
 
 .SH AUTHOR
 
