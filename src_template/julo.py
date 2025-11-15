@@ -140,7 +140,7 @@ class FilesDownloader:
     """Загрузчик файлов по файлу с маркированными ссылками."""
     def __init__(self,
                  urlsfname, marker, rmarker, namesep,
-                 notname, notmsg_load, notmsg_comp,
+                 notname, notmsg_load_t, notmsg_comp_t,
                  patterns,
                  loadcmd,
                  tmppref, tmpsuf, tmphlen,
@@ -152,8 +152,10 @@ class FilesDownloader:
         namesep        разделитель имени
         notifymsg      сообщение для уведомления
         notname        название уведомителя
-        notmsg_load    сообщение для уведомления о загрузке
-        notmsg_comp    сообщение для уведомления о завершении
+        notmsg_load_t  шаблон сообщения для уведомления о загрузке
+                       аргумент %file заменяется на имя загруженного файла
+        notmsg_comp_t  шаблон сообщения для уведомления о завершении
+                       аргументов нет
         patterns       список с загрузчиком и шаблонами (в кортежах):
                          - команда загрузки с аргументом %url
                          - шаблон начала поиска
@@ -180,8 +182,8 @@ class FilesDownloader:
         self._rmarker = rmarker
         self._namesep = namesep
         self._notname = notname
-        self._notmsg_load = notmsg_load
-        self._notmsg_comp = notmsg_comp
+        self._notmsg_load_t = notmsg_load_t
+        self._notmsg_comp_t = notmsg_comp_t
         self._patterns = patterns
         self._loadcmd = loadcmd
         self._tmppref = tmppref
@@ -204,8 +206,8 @@ class FilesDownloader:
         rmarker = self._rmarker
         namesep = self._namesep
         notname = self._notname
-        notmsg_load = self._notmsg_load
-        notmsg_comp = self._notmsg_comp
+        notmsg_load_t = self._notmsg_load_t
+        notmsg_comp_t = self._notmsg_comp_t
         patterns = self._patterns
         loadcmd = self._loadcmd
         tmppref = self._tmppref
@@ -224,6 +226,10 @@ class FilesDownloader:
             print('No urls')
             return
         nh = NoticeHandler(notname, ': ')
+
+        notmsg_load = notmsg_load_t
+        notmsg_comp = notmsg_comp_t
+
         while page is not None:
             dirurl = page
             for p in patterns:
