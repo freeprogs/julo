@@ -226,10 +226,14 @@ class FilesDownloader:
             print('No urls')
             return
         nh = NoticeHandler(notname, ': ')
-
-        notmsg_load = notmsg_load_t
-        notmsg_comp = notmsg_comp_t
-
+        nmh = NoticeMessageHandler()
+        if fxdname is not None:
+            filename = fxdname
+        else:
+            filename = NameHandler('', 0).get_next(nxtpref, nxtsuf)
+        nmh.set_load_config({'file': filename})
+        notmsg_load = nmh.get_load_message(notmsg_load_t)
+        notmsg_comp = nmh.get_complete_message(notmsg_comp_t)
         while page is not None:
             dirurl = page
             for p in patterns:
@@ -724,6 +728,25 @@ class NoticeHandler:
         cmdlst = ['kdialog', '--passivepopup',
                   '{0}{1}{2}'.format(self._name, self._sep, s)]
         subprocess.call(cmdlst)
+
+class NoticeMessageHandler:
+    def __init__(self):
+        self._load_config = {}
+        self._complete_config = {}
+
+    def set_load_config(self, config)
+        self._load_config = config
+
+    def set_complete_config(self, config)
+        self._complete_config = config
+
+    def get_load_message(self, template):
+        out = template
+        return out
+
+    def get_complete_message(self, template):
+        out = template
+        return out
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
