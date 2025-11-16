@@ -412,6 +412,11 @@ class PageDefaultLoader:
         self._charset = None
 
     def open_stream(self, url):
+        #дано    : ссылка на страницу
+        #получить: открыт поток для чтения страницы и
+        #          кодировка страницы установлена
+        """Открыть поток для чтения страницы и установить кодировку
+        страницы."""
         self._stream = urllib.request.urlopen(url)
         mo = re.search(r'charset=([a-z0-9-]+)',
                        self._stream.getheader('Content-Type'),
@@ -422,9 +427,15 @@ class PageDefaultLoader:
             self._charset = 'latin1'
 
     def get_stream(self):
+        #дано    :
+        #получить: поток для чтения страницы
+        """Получить поток для чтения страницы."""
         return self._stream
 
     def get_charset(self):
+        #дано    :
+        #получить: кодировка для чтения страницы
+        """Получить сохранённую кодировку страницы."""
         return self._charset
 
 class PageCmdlineLoader:
