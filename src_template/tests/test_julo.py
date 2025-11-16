@@ -68,3 +68,30 @@ import __PROGRAM_NAME__
 def test_command_line_split(io):
     i, o = io
     assert __PROGRAM_NAME__.CommandLineHandler().split(i) == o, str((i, o))
+
+@pytest.mark.parametrize(
+    'io', (
+        ({'spec': 'x'}, '', ''),
+        ({'spec': 'x'}, 'a', 'a'),
+        ({'spec': 'x'}, '%', '%'),
+        ({'spec': 'x'}, '%spec', 'x'),
+        ({'spec': 'x'}, 'a%spec', 'ax'),
+        ({'spec': 'x'}, '%speca', 'xa'),
+        ({'spec': 'x'}, 'a%speca', 'axa'),
+        ({'spec': 'x'}, '%spec%spec', 'xx'),
+        ({'spec': 'x'}, 'a%specb%specc', 'axbxc'),
+
+        ({'spec1': 'x', 'spec2': 'y'}, '', ''),
+        ({'spec1': 'x', 'spec2': 'y'}, 'a', 'a'),
+        ({'spec1': 'x', 'spec2': 'y'}, '%', '%'),
+        ({'spec1': 'x', 'spec2': 'y'}, '%spec1%spec2', 'xy'),
+        ({'spec1': 'x', 'spec2': 'y'}, '%spec1a%spec2', 'xay'),
+        ({'spec1': 'x', 'spec2': 'y'}, 'a%spec1%spec2b', 'axyb'),
+        ({'spec1': 'x', 'spec2': 'y'}, 'a%spec1b%spec2c', 'axbyc'),
+    )
+)
+def test_notice_message_hander_load_message(io):
+    i1, i2, o = io
+    nmh = __PROGRAM_NAME__.NoticeMessageHandler()
+    nmh.set_load_config(i1)
+    assert nmh.get_load_message(i2) == o, str((i1, i2, o))

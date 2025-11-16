@@ -734,18 +734,31 @@ class NoticeMessageHandler:
         self._load_config = {}
         self._complete_config = {}
 
-    def set_load_config(self, config)
+    def set_load_config(self, config):
         self._load_config = config
 
-    def set_complete_config(self, config)
+    def set_complete_config(self, config):
         self._complete_config = config
 
     def get_load_message(self, template):
         out = template
+        dct = self._load_config
+        prev = None
+        while prev != out:
+            prev = out
+            for k, v in dct.items():
+                out = out.replace('%' + k, v)
+            prev = out
         return out
 
     def get_complete_message(self, template):
         out = template
+        dct = self._complete_config
+        prev = None
+        while prev != out:
+            for k, v in dct.items():
+                out = out.replace('%' + k, v)
+            prev = out
         return out
 
 if __name__ == '__main__':
