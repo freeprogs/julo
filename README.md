@@ -116,6 +116,7 @@ Also the file url is marked as downloaded when the file has been downloaded.
            notice name   -- which name to display in the displayed download notice
            notice one    -- which message to display in the displayed download notice
                             when one file has been complete
+                            can hold %file for display file name in the message
            notice all    -- which message to display in the displayed download notice
                             when all files have been complete
            pattern load  -- which command for loading the page to run
@@ -193,7 +194,7 @@ File julo.xml:
     <?xml version="1.0" encoding="utf-8"?>
     <site name="YouTube">
       <urls file="urls" search="*" replace="[" namesep=" " />
-      <notice name="YouTube" one="one loaded" all="all loaded" />
+      <notice name="YouTube" one="loaded %file" all="all loaded" />
       <patterns />
       <load cmd="yt-dlp -c --proxy socks5://localhost:1080 %url -o %file" />
       <temp prefix="yt_tmp_" suffix=".mp4" random="8" />
@@ -220,6 +221,14 @@ Output files:
     yt_vid_3.mp4
     lesson.mp4
 
-Here  you  see  how  to  load videos from YouTube by the program yt-dlp and some
-tricks within the command line without jumps by patterns for pages. First  three
+Output messages:
+
+    YouTube: loaded yt_vid_1.mp4
+    YouTube: loaded yt_vid_2.mp4
+    YouTube: loaded yt_vid_3.mp4
+    YouTube: loaded lesson.mp4
+    YouTube: all loaded
+
+Here you see how to load videos from YouTube by the program yt-dlp and some
+tricks within the command line without jumps by patterns for pages. First three
 videos are saved by the order and the fourth video is saved by the fixed name.
