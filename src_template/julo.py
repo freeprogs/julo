@@ -759,6 +759,7 @@ class NoticeHandler:
     def notify(self, s):
         #дано    : задана строка s
         #получить: выведено сообщение name+sep+s
+        """Вывести сообщение с помощью внешней программы."""
         cmdlst = ['kdialog', '--passivepopup',
                   '{0}{1}{2}'.format(self._name, self._sep, s)]
         subprocess.call(cmdlst)
