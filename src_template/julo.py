@@ -442,11 +442,26 @@ class PageCmdlineLoader:
     """Загрузчик страницы, который загружает страницу через внешний
     процесс."""
     def __init__(self, cmd):
+        #дано    : внешняя команда в виде шаблона
+        #получить: внешняя команда сохранена
+        """Сохранить внешнюю команду в виде шаблона.
+
+        cmd  внешняя команда в виде шаблона
+
+        пример:
+        PageCmdlineLoader('curl %url')
+
+        """
         self._cmd = cmd
         self._stream = None
         self._charset = None
 
     def open_stream(self, url):
+        #дано    : ссылка на страницу
+        #получить: открыт поток для чтения страницы из внешней
+        #          команды и кодировка страницы установлена
+        """Открыть поток для чтения страницы и установить кодировку
+        страницы."""
         clh = CommandLineHandler()
         cmdlst = clh.split(self._cmd)
         for i, string in enumerate(cmdlst):
@@ -457,9 +472,15 @@ class PageCmdlineLoader:
         self._charset = 'utf-8'
 
     def get_stream(self):
+        #дано    :
+        #получить: поток для чтения страницы
+        """Получить поток для чтения страницы."""
         return self._stream
 
     def get_charset(self):
+        #дано    :
+        #получить: кодировка для чтения страницы
+        """Получить сохранённую кодировку страницы."""
         return self._charset
 
 class DownloadHandler:
