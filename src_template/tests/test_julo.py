@@ -71,6 +71,35 @@ def test_command_line_split(io):
 
 @pytest.mark.parametrize(
     'io', (
+        ([''], '', 0, '', '', '1'),
+        ([''], '', 0, 'a', '', 'a1'),
+        ([''], '', 0, '', 'b', '1b'),
+        ([''], '', 0, 'a', 'b', 'a1b'),
+        ([''], 'string', 8, '', '', '1'),
+        ([''], 'string', 8, 'a', '', 'a1'),
+        ([''], 'string', 8, '', 'b', '1b'),
+        ([''], 'string', 8, 'a', 'b', 'a1b'),
+
+        (['1'], '', 0, '', '', '2'),
+        (['1'], '', 0, 'a', 'b', 'a1b'),
+        (['a1'], '', 0, 'a', '', 'a2'),
+        (['1b'], '', 0, '', 'b', '2b'),
+        (['a1b'], '', 0, 'a', 'b', 'a2b'),
+        (['1'], 'string', 8, '', '', '2'),
+        (['1'], 'string', 8, 'a', 'b', 'a1b'),
+        (['a1'], 'string', 8, 'a', '', 'a2'),
+        (['1b'], 'string', 8, '', 'b', '2b'),
+        (['a1b'], 'string', 8, 'a', 'b', 'a2b'),
+    )
+)
+def test_name_handler_get_next(io, mocker):
+    i1, i2, i3, i4, i5, o = io
+    mocker.patch('os.listdir').return_value = i1
+    nmh = __PROGRAM_NAME__.NameHandler(i2, i3)
+    assert nmh.get_next(i4, i5) == o, str((i1, i2, i3, i4, i5, o))
+
+@pytest.mark.parametrize(
+    'io', (
         ({'spec': 'x'}, '', ''),
         ({'spec': 'x'}, 'a', 'a'),
         ({'spec': 'x'}, '%', '%'),
