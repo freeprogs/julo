@@ -227,12 +227,7 @@ class FilesDownloader:
             return
         nh = NoticeHandler(notname, ': ')
         nmh = NoticeMessageHandler()
-        if fxdname is not None:
-            filename = fxdname
-        else:
-            filename = NameHandler('', 0).get_next(nxtpref, nxtsuf)
-        nmh.set_load_config({'file': filename})
-        notmsg_load = nmh.get_load_message(notmsg_load_t)
+        nmh.set_complete_config({})
         notmsg_comp = nmh.get_complete_message(notmsg_comp_t)
         while page is not None:
             dirurl = page
@@ -244,6 +239,13 @@ class FilesDownloader:
             if not dirurl:
                 print('Direct url is not found')
                 return
+            if fxdname is not None:
+                filename = fxdname
+            else:
+                filename = \
+                    NameHandler('', 0).get_next(nxtpref, nxtsuf)
+            nmh.set_load_config({'file': filename})
+            notmsg_load = nmh.get_load_message(notmsg_load_t)
             dh = DownloadHandler(loadcmd,
                                  dirurl,
                                  (tmppref, tmpsuf, page, tmphlen),
