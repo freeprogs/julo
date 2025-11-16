@@ -765,17 +765,50 @@ class NoticeHandler:
         subprocess.call(cmdlst)
 
 class NoticeMessageHandler:
+    """Сформировать сообщения одной закачки и всех закачек для вывода
+    из шаблонов со спецификаторами."""
     def __init__(self):
         self._load_config = {}
         self._complete_config = {}
 
     def set_load_config(self, config):
+        #дано    : конфигурация спецификаторов
+        #получить: конфигурация спецификаторов сохранена
+        """Установить конфигурацию спецификаторов для сообщения одной
+        закачки.
+
+        пример:
+        {'file': 'some_name.mp4'}
+
+        """
         self._load_config = config
 
     def set_complete_config(self, config):
+        #дано    : конфигурация спецификаторов
+        #получить: конфигурация спецификаторов сохранена
+        """Установить конфигурацию спецификаторов для сообщения всех
+        закачек.
+
+        пример:
+        {}
+
+        """
         self._complete_config = config
 
     def get_load_message(self, template):
+        #дано    : шаблон сообщения со спецификаторами
+        #получить: соообщение после подстановки значений вместо
+        #          спецификаторов
+        """Сформировать сообщение из шаблона со спецификаторами для
+        одной закачки.
+
+        %file  заменить на имя закачанного файла.
+
+        пример:
+
+        'loaded %file' -> 'loaded some_name.mp4'
+
+        """
         out = template
         dct = self._load_config
         prev = None
@@ -787,6 +820,15 @@ class NoticeMessageHandler:
         return out
 
     def get_complete_message(self, template):
+        #дано    : шаблон сообщения со спецификаторами
+        #получить: соообщение после подстановки значений вместо
+        #          спецификаторов
+        """Сформировать сообщение из шаблона со спецификаторами для
+        всех закачек.
+
+        в данный момент спецификаторов нет
+
+        """
         out = template
         dct = self._complete_config
         prev = None
