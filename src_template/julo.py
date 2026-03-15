@@ -838,7 +838,7 @@ class NoticeMessageHandler:
             prev = out
         return out
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         cfname = sys.argv[1]
     else:
@@ -848,7 +848,7 @@ if __name__ == '__main__':
             'Config file is not found: {}'.format(cfname),
             file=sys.stderr
         )
-        sys.exit(1)
+        return 1
     cfh = ConfigFileHandler(cfname)
     cfh.load_config()
     assert cfh.getname(), 'The site name is empty'
@@ -866,3 +866,11 @@ if __name__ == '__main__':
                          tpref, tsuf, tlen,
                          npref, nsuf)
     fd.download_files()
+    return 0
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print('\nBye!', file=sys.stderr)
+        sys.exit(2)
