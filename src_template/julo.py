@@ -35,6 +35,7 @@ __license__ = '__PROGRAM_LICENSE__'
 
 # 15.11.2012
 
+import argparse
 import os
 import urllib.request
 import urllib.error
@@ -838,11 +839,56 @@ class NoticeMessageHandler:
             prev = out
         return out
 
+def parse_arguments():
+    desc = """\
+Read the config file, take urls from the urls file and jump to the
+internal site pages to get the direct url to a file. Then download the
+file by its direct url.\
+    """
+    parser = argparse.ArgumentParser(
+        description=desc,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument(
+        'config_file',
+        metavar='config',
+        nargs='?',
+        default='__PROGRAM_NAME__.xml',
+        help="""Configuration file for loading (default: __PROGRAM_NAME__.xml)"""
+    )
+    optiontext = 'v' + __version__
+    parser.add_argument('--version', '-V',
+                        action='version',
+                        version=optiontext)
+    optiontext = ('License: {}, see more details'
+                  ' at <http://www.gnu.org/licenses/>.'.format(__license__))
+    parser.add_argument('--license',
+                        action='version',
+                        version=optiontext,
+                        help='show program\'s license and exit')
+    args = parser.parse_args()
+    return args
+
+def make_configuration(cmdline_args):
+    arg_configfile = cmdline_args.config_file
+    config = {}
+    config_set_configfile(config, arg_configfile)
+    out = config
+    return out
+
+def config_set_configfile(config, value):
+    config['config_file'] = value
+    out = config
+    return out
+
+def config_get_configfile(config):
+    out = config.get('config_file')
+    return out
+
 def main():
-    if len(sys.argv) > 1:
-        cfname = sys.argv[1]
-    else:
-        cfname = 'julo.xml'
+    args = parse_arguments()
+    config = make_configuration(args)
+    cfname = config_get_configfile(config)
     if not os.path.exists(cfname):
         print(
             'Config file is not found: {}'.format(cfname),
