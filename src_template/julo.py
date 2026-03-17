@@ -861,7 +861,7 @@ file by its direct url.\
         metavar='config',
         nargs='?',
         default='__PROGRAM_NAME__.xml',
-        help="""Configuration file for loading (default: __PROGRAM_NAME__.xml)"""
+        help="""configuration file for loading (default: __PROGRAM_NAME__.xml)"""
     )
     parser.add_argument(
         '-c',
