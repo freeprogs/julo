@@ -863,6 +863,12 @@ file by its direct url.\
         default='__PROGRAM_NAME__.xml',
         help="""Configuration file for loading (default: __PROGRAM_NAME__.xml)"""
     )
+    parser.add_argument(
+        '-c',
+        dest='create_config_file',
+        metavar='filename',
+        help="""create interactively configuration file for loading"""
+    )
     optiontext = 'v' + __version__
     parser.add_argument('--version', '-V',
                         action='version',
@@ -878,8 +884,10 @@ file by its direct url.\
 
 def make_configuration(cmdline_args):
     arg_configfile = cmdline_args.config_file
+    arg_createconfigfile = cmdline_args.create_config_file
     config = {}
     config_set_configfile(config, arg_configfile)
+    config_set_createconfigfile(config, arg_createconfigfile)
     out = config
     return out
 
@@ -892,17 +900,17 @@ def config_get_configfile(config):
     out = config.get('config_file')
     return out
 
-def main():
-    args = parse_arguments()
-    config = make_configuration(args)
-    cfname = config_get_configfile(config)
-    if not os.path.exists(cfname):
-        print(
-            'Config file is not found: {}'.format(cfname),
-            file=sys.stderr
-        )
-        return 1
-    cfh = ConfigFileHandler(cfname)
+def config_set_createconfigfile(config, value):
+    config['create_config_file'] = value
+    out = config
+    return out
+
+def config_get_createconfigfile(config):
+    out = config.get('create_config_file')
+    return out
+
+def download_files(config_file):
+    cfh = ConfigFileHandler(config_file)
     cfh.load_config()
     assert cfh.getname(), 'The site name is empty'
     print('Load config...', cfh.getname())
@@ -919,6 +927,25 @@ def main():
                          tpref, tsuf, tlen,
                          npref, nsuf)
     fd.download_files()
+
+def create_config_file(config_file):
+    print('create_config_file', config_file)
+
+def main():
+    args = parse_arguments()
+    config = make_configuration(args)
+    create_config_fname = config_get_createconfigfile(config)
+    if create_config_fname is not None:
+        create_config_file(create_config_fname)
+        return 0
+    config_fname = config_get_configfile(config)
+    if not os.path.exists(config_fname):
+        print(
+            'Config file is not found: {}'.format(config_fname),
+            file=sys.stderr
+        )
+        return 1
+    download_files(config_fname)
     return 0
 
 if __name__ == '__main__':
