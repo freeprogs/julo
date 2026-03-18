@@ -46,6 +46,41 @@ import hashlib
 import xml.etree.ElementTree
 import sys
 
+class ConfigFileCreator:
+
+    def __init__(self, config_file):
+        self.config_file = config_file
+
+    def start(self):
+        print('start()')
+
+    def set_site_name(self):
+        print('set_site_name()')
+
+    def set_urls_file(self):
+        print('set_urls_file()')
+
+    def set_notice_messages(self):
+        print('set_notice_messages()')
+
+    def set_patterns(self):
+        print('set_patterns()')
+
+    def set_load_command(self):
+        print('set_load_command()')
+
+    def set_temp_file_names(self):
+        print('set_temp_file_names()')
+
+    def set_final_file_names(self):
+        print('set_final_file_names()')
+
+    def save_to_file(self):
+        print('save_to_file()')
+
+    def end(self):
+        print('end()')
+
 class ConfigFileHandler:
     """Загружает данные из xml-файла."""
     def __init__(self, fname):
@@ -909,6 +944,19 @@ def config_get_createconfigfile(config):
     out = config.get('create_config_file')
     return out
 
+def create_config_file(config_file):
+    cfc = ConfigFileCreator(config_file)
+    cfc.start()
+    cfc.set_site_name()
+    cfc.set_urls_file()
+    cfc.set_notice_messages()
+    cfc.set_patterns()
+    cfc.set_load_command()
+    cfc.set_temp_file_names()
+    cfc.set_final_file_names()
+    cfc.save_to_file()
+    cfc.end()
+
 def download_files(config_file):
     cfh = ConfigFileHandler(config_file)
     cfh.load_config()
@@ -927,9 +975,6 @@ def download_files(config_file):
                          tpref, tsuf, tlen,
                          npref, nsuf)
     fd.download_files()
-
-def create_config_file(config_file):
-    print('create_config_file', config_file)
 
 def main():
     args = parse_arguments()
