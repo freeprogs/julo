@@ -77,7 +77,7 @@ class ConfigFileCreator:
         self._dct['load_command'] = load_command
 
     def set_temp_file_names(self):
-        temp_filenames = 'temp_filenames'
+        temp_filenames = self._dialog.ask_temp_filenames()
         self._dct['temp_filenames'] = temp_filenames
 
     def set_final_file_names(self):
@@ -151,6 +151,19 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell the load command')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_temp_filenames(self):
+        out = None
+        while True:
+            print('Tell the temp filenames')
             reply = input('> ')
             if reply:
                 out = reply
