@@ -65,7 +65,7 @@ class ConfigFileCreator:
         self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
-        notice_messages = 'notice_messages'
+        notice_messages = self._dialog.ask_notice_messages()
         self._dct['notice_messages'] = notice_messages
 
     def set_patterns(self):
@@ -112,6 +112,19 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell the urls file')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_notice_messages(self):
+        out = None
+        while True:
+            print('Tell the notice messages')
             reply = input('> ')
             if reply:
                 out = reply
