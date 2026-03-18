@@ -73,7 +73,7 @@ class ConfigFileCreator:
         self._dct['patterns'] = patterns
 
     def set_load_command(self):
-        load_command = 'load_command'
+        load_command = self._dialog.ask_load_command()
         self._dct['load_command'] = load_command
 
     def set_temp_file_names(self):
@@ -138,6 +138,19 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell the patterns')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_load_command(self):
+        out = None
+        while True:
+            print('Tell the load command')
             reply = input('> ')
             if reply:
                 out = reply
