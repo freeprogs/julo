@@ -61,7 +61,7 @@ class ConfigFileCreator:
         self._dct['site_name'] = site_name
 
     def set_urls_file(self):
-        urls_file = 'urls_file'
+        urls_file = self._dialog.ask_urls_file()
         self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
@@ -99,6 +99,19 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell the site name')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_urls_file(self):
+        out = None
+        while True:
+            print('Tell the urls file')
             reply = input('> ')
             if reply:
                 out = reply
