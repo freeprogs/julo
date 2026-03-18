@@ -51,12 +51,13 @@ class ConfigFileCreator:
     def __init__(self, config_file):
         self.config_file = config_file
         self._dct = None
+        self._dialog = ConfigFileCreationDialog()
 
     def start(self):
         self._dct = {}
 
     def set_site_name(self):
-        site_name = 'site_name'
+        site_name = self._dialog.ask_site_name()
         self._dct['site_name'] = site_name
 
     def set_urls_file(self):
@@ -88,6 +89,24 @@ class ConfigFileCreator:
 
     def end(self):
         self._dct = None
+
+class ConfigFileCreationDialog:
+
+    def __init__(self):
+        pass
+
+    def ask_site_name(self):
+        out = None
+        while True:
+            print('Tell the site name')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
 
 class ConfigFileHandler:
     """Загружает данные из xml-файла."""
