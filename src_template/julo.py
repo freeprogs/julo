@@ -69,7 +69,7 @@ class ConfigFileCreator:
         self._dct['notice_messages'] = notice_messages
 
     def set_patterns(self):
-        patterns = 'patterns'
+        patterns = self._dialog.ask_patterns()
         self._dct['patterns'] = patterns
 
     def set_load_command(self):
@@ -125,6 +125,19 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell the notice messages')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok', reply)
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_patterns(self):
+        out = None
+        while True:
+            print('Tell the patterns')
             reply = input('> ')
             if reply:
                 out = reply
