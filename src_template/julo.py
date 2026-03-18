@@ -50,36 +50,44 @@ class ConfigFileCreator:
 
     def __init__(self, config_file):
         self.config_file = config_file
+        self._dct = None
 
     def start(self):
-        print('start()')
+        self._dct = {}
 
     def set_site_name(self):
-        print('set_site_name()')
+        site_name = 'site_name'
+        self._dct['site_name'] = site_name
 
     def set_urls_file(self):
-        print('set_urls_file()')
+        urls_file = 'urls_file'
+        self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
-        print('set_notice_messages()')
+        notice_messages = 'notice_messages'
+        self._dct['notice_messages'] = notice_messages
 
     def set_patterns(self):
-        print('set_patterns()')
+        patterns = 'patterns'
+        self._dct['patterns'] = patterns
 
     def set_load_command(self):
-        print('set_load_command()')
+        load_command = 'load_command'
+        self._dct['load_command'] = load_command
 
     def set_temp_file_names(self):
-        print('set_temp_file_names()')
+        temp_filenames = 'temp_filenames'
+        self._dct['temp_filenames'] = temp_filenames
 
     def set_final_file_names(self):
-        print('set_final_file_names()')
+        final_filenames = 'final_filenames'
+        self._dct['final_filenames'] = final_filenames
 
     def save_to_file(self):
-        print('save_to_file()')
+        print('save_to_file()', self._dct)
 
     def end(self):
-        print('end()')
+        self._dct = None
 
 class ConfigFileHandler:
     """Загружает данные из xml-файла."""
