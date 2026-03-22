@@ -104,7 +104,8 @@ class ConfigFileCreator:
         self._dct['patterns'] = patterns
 
     def set_load_command(self):
-        load_command = self._dialog.ask_load_command()
+        default_command = 'curl %url -o %file'
+        load_command = self._dialog.ask_load_command(default_command)
         self._dct['load_command'] = load_command
 
     def set_temp_file_names(self):
@@ -283,14 +284,19 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_load_command(self):
+    def ask_load_command(self, default):
         out = None
         while True:
             print('Tell the load command')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
