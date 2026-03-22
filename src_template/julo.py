@@ -57,7 +57,8 @@ class ConfigFileCreator:
         self._dct = {}
 
     def set_site_name(self):
-        site_name = self._dialog.ask_site_name()
+        default_name = 'Unknown'
+        site_name = self._dialog.ask_site_name(default_name)
         self._dct['site_name'] = site_name
 
     def set_urls_file(self):
@@ -112,14 +113,19 @@ class ConfigFileCreationDialog:
     def __init__(self):
         pass
 
-    def ask_site_name(self):
+    def ask_site_name(self, default):
         out = None
         while True:
             print('Tell the site name')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
