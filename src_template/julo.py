@@ -126,7 +126,16 @@ class ConfigFileCreator:
         self._dct['temp_filenames'] = temp_filenames
 
     def set_final_file_names(self):
-        final_filenames = self._dialog.ask_final_filenames()
+        default_prefix = 'file'
+        default_suffix = '.mp4'
+        final_filenames_prefix = \
+            self._dialog.ask_final_filenames_prefix(default_prefix)
+        final_filenames_suffix = \
+            self._dialog.ask_final_filenames_suffix(default_suffix)
+        final_filenames = {
+            'prefix': final_filenames_prefix,
+            'suffix': final_filenames_suffix,
+        }
         self._dct['final_filenames'] = final_filenames
 
     def save_to_file(self):
@@ -369,14 +378,37 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_final_filenames(self):
+    def ask_final_filenames_prefix(self, default):
         out = None
         while True:
-            print('Tell the final filenames')
+            print('Tell the final filenames prefix')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_final_filenames_suffix(self, default):
+        out = None
+        while True:
+            print('Tell the final filenames suffix')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
