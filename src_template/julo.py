@@ -109,7 +109,20 @@ class ConfigFileCreator:
         self._dct['load_command'] = load_command
 
     def set_temp_file_names(self):
-        temp_filenames = self._dialog.ask_temp_filenames()
+        default_prefix = 'tmp_'
+        default_suffix = '.mp4'
+        default_random = '8'
+        temp_filenames_prefix = \
+            self._dialog.ask_temp_filenames_prefix(default_prefix)
+        temp_filenames_suffix = \
+            self._dialog.ask_temp_filenames_suffix(default_suffix)
+        temp_filenames_random = \
+            self._dialog.ask_temp_filenames_random(default_random)
+        temp_filenames = {
+            'prefix': temp_filenames_prefix,
+            'suffix': temp_filenames_suffix,
+            'random': temp_filenames_random,
+        }
         self._dct['temp_filenames'] = temp_filenames
 
     def set_final_file_names(self):
@@ -302,14 +315,55 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_temp_filenames(self):
+    def ask_temp_filenames_prefix(self, default):
         out = None
         while True:
-            print('Tell the temp filenames')
+            print('Tell the temp filenames prefix')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_temp_filenames_suffix(self, default):
+        out = None
+        while True:
+            print('Tell the temp filenames suffix')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_temp_filenames_random(self, default):
+        out = None
+        while True:
+            print('Tell the temp filenames random length')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
