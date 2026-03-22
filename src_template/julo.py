@@ -83,7 +83,20 @@ class ConfigFileCreator:
         self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
-        notice_messages = self._dialog.ask_notice_messages()
+        default_name = ''
+        default_one = 'loaded %file'
+        default_all = 'all loaded'
+        notice_messages_name = \
+            self._dialog.ask_notice_messages_name(default_name)
+        notice_messages_one = \
+            self._dialog.ask_notice_messages_one(default_one)
+        notice_messages_all = \
+            self._dialog.ask_notice_messages_all(default_all)
+        notice_messages = {
+            'name': notice_messages_name,
+            'one': notice_messages_one,
+            'all': notice_messages_all,
+        }
         self._dct['notice_messages'] = notice_messages
 
     def set_patterns(self):
@@ -203,14 +216,55 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_notice_messages(self):
+    def ask_notice_messages_name(self, default):
         out = None
         while True:
-            print('Tell the notice messages')
+            print('Tell the notice messages name')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_notice_messages_one(self, default):
+        out = None
+        while True:
+            print('Tell the notice messages one file')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_notice_messages_all(self, default):
+        out = None
+        while True:
+            print('Tell the notice messages all files')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
