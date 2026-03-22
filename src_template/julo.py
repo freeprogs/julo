@@ -61,7 +61,24 @@ class ConfigFileCreator:
         self._dct['site_name'] = site_name
 
     def set_urls_file(self):
-        urls_file = self._dialog.ask_urls_file()
+        default_name = 'urls'
+        default_search = '*'
+        default_replace = '['
+        default_namesep = ' '
+        urls_file_name = \
+            self._dialog.ask_urls_file_name(default_name)
+        urls_file_search = \
+            self._dialog.ask_urls_file_search(default_search)
+        urls_file_replace = \
+            self._dialog.ask_urls_file_replace(default_replace)
+        urls_file_namesep = \
+            self._dialog.ask_urls_file_namesep(default_namesep)
+        urls_file = {
+            'name': urls_file_name,
+            'search': urls_file_search,
+            'replace': urls_file_replace,
+            'namesep': urls_file_namesep,
+        }
         self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
@@ -108,14 +125,73 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_urls_file(self):
+    def ask_urls_file_name(self, default):
         out = None
         while True:
-            print('Tell the urls file')
+            print('Tell the urls file name')
+            print('(default: "{}")'.format(default))
             reply = input('> ')
-            if reply:
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
                 out = reply
-                print('ok', reply)
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_urls_file_search(self, default):
+        out = None
+        while True:
+            print('Tell the urls file search marker')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_urls_file_replace(self, default):
+        out = None
+        while True:
+            print('Tell the urls file replace marker')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_urls_file_namesep(self, default):
+        out = None
+        while True:
+            print('Tell the urls file name separator')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
                 break
             else:
                 print('fail')
