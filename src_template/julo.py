@@ -139,7 +139,7 @@ class ConfigFileCreator:
         self._dct['final_filenames'] = final_filenames
 
     def save_to_file(self):
-        print('save_to_file()', self._dct)
+        print('save_to_file()', self.config_file, self._dct)
 
     def end(self):
         self._dct = None
