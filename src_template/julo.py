@@ -100,7 +100,21 @@ class ConfigFileCreator:
         self._dct['notice_messages'] = notice_messages
 
     def set_patterns(self):
-        patterns = self._dialog.ask_patterns()
+        patterns = []
+        default_load = 'curl %url'
+        while self._dialog.ask_patterns_want_add():
+            pattern_load = self._dialog.ask_pattern_load(default_load)
+            pattern_start = self._dialog.ask_pattern_start()
+            pattern_left = self._dialog.ask_pattern_left()
+            pattern_right = self._dialog.ask_pattern_right()
+            pattern = {
+                'load': pattern_load,
+                'start': pattern_start,
+                'left': pattern_left,
+                'right': pattern_right,
+            }
+            self._dialog.print_pattern_total(pattern)
+            patterns.append(pattern)
         self._dct['patterns'] = patterns
 
     def set_load_command(self):
@@ -293,18 +307,95 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_patterns(self):
+    def ask_patterns_want_add(self):
         out = None
         while True:
-            print('Tell the patterns')
+            print('Tell whether to add a pattern')
+            print('Input y/n')
             reply = input('> ')
-            if reply:
-                out = reply
-                print('ok', reply)
+            if reply == 'y':
+                print('ok', 'start to add')
+                out = True
+                break
+            elif not reply or reply == 'n':
+                print('ok', 'don\'t need pattern')
+                out = False
                 break
             else:
                 print('fail')
         return out
+
+    def ask_pattern_load(self, default):
+        out = None
+        while True:
+            print('Tell the page load command')
+            print('(default: "{}")'.format(default))
+            reply = input('> ')
+            if reply == '':
+                out = default
+                print('ok "{}"'.format(default))
+                break
+            elif reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_pattern_start(self):
+        out = None
+        while True:
+            print('Tell the regexp for start to search url')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_pattern_left(self):
+        out = None
+        while True:
+            print('Tell the regexp for left bound of the url')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def ask_pattern_right(self):
+        out = None
+        while True:
+            print('Tell the regexp for right bound of the url')
+            reply = input('> ')
+            if reply:
+                out = reply
+                print('ok "{}"'.format(reply))
+                break
+            else:
+                print('fail')
+        return out
+
+    def print_pattern_total(self, pattern):
+        fmt = (
+            'You entered pattern:\n'
+            ' load: "{}"\n'
+            'start: "{}"\n'
+            ' left: "{}"\n'
+            'right: "{}"\n'
+        )
+        print(fmt.format(
+            pattern.get('load'),
+            pattern.get('start'),
+            pattern.get('left'),
+            pattern.get('right'),
+        ), end='')
 
     def ask_load_command(self, default):
         out = None
