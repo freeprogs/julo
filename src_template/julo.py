@@ -153,7 +153,17 @@ class ConfigFileCreator:
         self._dct['final_filenames'] = final_filenames
 
     def save_to_file(self):
-        print('save_to_file()', self.config_file, self._dct)
+        self._xmldoc.build_site(self._dct['site_name'])
+        self._xmldoc.build_urls_file(self._dct['urls_file'])
+        self._xmldoc.build_notice_messages(self._dct['notice_messages'])
+        self._xmldoc.build_patterns(self._dct['patterns'])
+        self._xmldoc.build_load_command(self._dct['load_command'])
+        self._xmldoc.build_temp_filenames(self._dct['temp_filenames'])
+        self._xmldoc.build_final_filenames(self._dct['final_filenames'])
+        self._xmldoc.compose_parts()
+        text = self._xmldoc.result()
+        with open(self.config_file, 'w', encoding='utf-8') as fout:
+            fout.write(text)
 
     def end(self):
         self._dct = None
