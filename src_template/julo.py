@@ -84,7 +84,7 @@ class ConfigFileCreator:
         self._dct['urls_file'] = urls_file
 
     def set_notice_messages(self):
-        default_name = 'Unknown'
+        default_name = 'unknown'
         default_one = 'loaded %file'
         default_all = 'all loaded'
         notice_messages_name = \
