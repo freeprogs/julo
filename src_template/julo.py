@@ -154,6 +154,7 @@ class ConfigFileCreator:
         self._dct['final_filenames'] = final_filenames
 
     def save_to_file(self):
+        self._xmldoc.build_header()
         self._xmldoc.build_site(self._dct['site_name'])
         self._xmldoc.build_urls_file(self._dct['urls_file'])
         self._xmldoc.build_notice_messages(self._dct['notice_messages'])
@@ -161,6 +162,7 @@ class ConfigFileCreator:
         self._xmldoc.build_load_command(self._dct['load_command'])
         self._xmldoc.build_temp_filenames(self._dct['temp_filenames'])
         self._xmldoc.build_final_filenames(self._dct['final_filenames'])
+        self._xmldoc.build_footer()
         self._xmldoc.compose_parts()
         text = self._xmldoc.result()
         with open(self.config_file, 'w', encoding='utf-8') as fout:
@@ -519,34 +521,150 @@ class ConfigFileCreationDialog:
 class ConfigFileXMLBuilder:
 
     def __init__(self):
-        pass
+        self._parts = []
+        self._result = None
+
+    def _escape(self, text):
+        text0 = text
+        text1 = text0.replace('&', '&amp;')
+        text2 = text1.replace('<', '&lt;')
+        text3 = text2.replace('>', '&gt;')
+        text4 = text3.replace('"', '&quot;')
+        out = text4
+        return out
+
+    def build_header(self):
+        text = '<?xml version="1.0" encoding="utf-8"?>'
+        self._parts.append(text)
 
     def build_site(self, value):
-        pass
+        e_value = self._escape(value)
+        fmt = '<site name="{name}">'
+        text = fmt.format(name=e_value)
+        self._parts.append(text)
 
     def build_urls_file(self, dct):
-        pass
+        e_name = self._escape(dct['name'])
+        e_search=self._escape(dct['search'])
+        e_replace=self._escape(dct['replace'])
+        e_namesep=self._escape(dct['namesep'])
+        fmt = (
+            '  '
+            '<urls '
+            'file="{name}" '
+            'search="{search}" '
+            'replace="{replace}" '
+            'namesep="{namesep}" '
+            '/>'
+        )
+        text = fmt.format(
+            name=e_name,
+            search=e_search,
+            replace=e_replace,
+            namesep=e_namesep,
+        )
+        self._parts.append(text)
 
     def build_notice_messages(self, dct):
-        pass
+        e_name=self._escape(dct['name'])
+        e_one=self._escape(dct['one'])
+        e_all=self._escape(dct['all'])
+        fmt = (
+            '  '
+            '<notice '
+            'name="{name}" '
+            'one="{one}" '
+            'all="{all}" '
+            '/>'
+        )
+        text = fmt.format(
+            name=e_name,
+            one=e_one,
+            all=e_all,
+        )
+        self._parts.append(text)
 
     def build_patterns(self, lst):
-        pass
+        if not lst:
+            text = '  <patterns />'
+            self._parts.append(text)
+        else:
+            header = '  <patterns>'
+            footer = '  </patterns>'
+            fmt = (
+                '    '
+                '<pattern '
+                'load="{load}"\n'
+                '             start="{start}"\n'
+                '             left="{left}"\n'
+                '             right="{right}" '
+                '/>'
+            )
+            self._parts.append(header)
+            for i in lst:
+                e_load=self._escape(i['load'])
+                e_start=self._escape(i['start'])
+                e_left=self._escape(i['left'])
+                e_right=self._escape(i['right'])
+                text = fmt.format(
+                    load=e_load,
+                    start=e_start,
+                    left=e_left,
+                    right=e_right,
+                )
+                self._parts.append(text)
+            self._parts.append(footer)
 
-    def build_load_command(self, dct):
-        pass
+    def build_load_command(self, value):
+        e_value = self._escape(value)
+        fmt = '  <load cmd="{command}" />'
+        text = fmt.format(command=e_value)
+        self._parts.append(text)
 
     def build_temp_filenames(self, dct):
-        pass
+        e_prefix=self._escape(dct['prefix'])
+        e_suffix=self._escape(dct['suffix'])
+        e_random=self._escape(dct['random'])
+        fmt = (
+            '  '
+            '<temp '
+            'prefix="{prefix}" '
+            'suffix="{suffix}" '
+            'random="{random}" '
+            '/>'
+        )
+        text = fmt.format(
+            prefix=e_prefix,
+            suffix=e_suffix,
+            random=e_random,
+        )
+        self._parts.append(text)
 
     def build_final_filenames(self, dct):
-        pass
+        e_prefix=self._escape(dct['prefix'])
+        e_suffix=self._escape(dct['suffix'])
+        fmt = (
+            '  '
+            '<final '
+            'prefix="{prefix}" '
+            'suffix="{suffix}" '
+            '/>'
+        )
+        text = fmt.format(
+            prefix=e_prefix,
+            suffix=e_suffix,
+        )
+        self._parts.append(text)
+
+    def build_footer(self):
+        text = '</site>'
+        self._parts.append(text)
 
     def compose_parts(self):
-        pass
+        self._result = '\n'.join(self._parts)
 
     def result(self):
-        out = ''
+        out = self._result
         return out
 
 class ConfigFileHandler:
