@@ -52,6 +52,7 @@ class ConfigFileCreator:
         self.config_file = config_file
         self._dct = None
         self._dialog = ConfigFileCreationDialog()
+        self._xmldoc = ConfigFileXMLBuilder()
 
     def start(self):
         self._dct = {}
@@ -513,6 +514,39 @@ class ConfigFileCreationDialog:
                 break
             else:
                 print('fail')
+        return out
+
+class ConfigFileXMLBuilder:
+
+    def __init__(self):
+        pass
+
+    def build_site(self, value):
+        pass
+
+    def build_urls_file(self, dct):
+        pass
+
+    def build_notice_messages(self, dct):
+        pass
+
+    def build_patterns(self, lst):
+        pass
+
+    def build_load_command(self, dct):
+        pass
+
+    def build_temp_filenames(self, dct):
+        pass
+
+    def build_final_filenames(self, dct):
+        pass
+
+    def compose_parts(self):
+        pass
+
+    def result(self):
+        out = ''
         return out
 
 class ConfigFileHandler:
