@@ -324,10 +324,10 @@ class ConfigFileCreationDialog:
         out = None
         while True:
             print('Tell whether to add a pattern')
-            print('Input y/n')
+            print('(input y/n, default: n)')
             reply = input('> ')
             if reply == 'y':
-                print('ok', 'start to add')
+                print('ok', 'start to add a pattern')
                 out = True
                 break
             elif not reply or reply == 'n':
@@ -359,7 +359,7 @@ class ConfigFileCreationDialog:
     def ask_pattern_start(self):
         out = None
         while True:
-            print('Tell the regexp for start to search url')
+            print('Tell the regexp for start searching url')
             reply = input('> ')
             if reply:
                 out = reply
@@ -372,7 +372,7 @@ class ConfigFileCreationDialog:
     def ask_pattern_left(self):
         out = None
         while True:
-            print('Tell the regexp for left bound of the url')
+            print('Tell the regexp for left border of the url')
             reply = input('> ')
             if reply:
                 out = reply
@@ -385,7 +385,7 @@ class ConfigFileCreationDialog:
     def ask_pattern_right(self):
         out = None
         while True:
-            print('Tell the regexp for right bound of the url')
+            print('Tell the regexp for right border of the url')
             reply = input('> ')
             if reply:
                 out = reply
