@@ -102,8 +102,9 @@ class ConfigFileCreator:
 
     def set_patterns(self):
         patterns = []
+        number_of_patterns = 0
         default_load = 'curl %url'
-        while self._dialog.ask_patterns_want_add():
+        while self._dialog.ask_patterns_want_add(number_of_patterns):
             pattern_load = self._dialog.ask_pattern_load(default_load)
             pattern_start = self._dialog.ask_pattern_start()
             pattern_left = self._dialog.ask_pattern_left()
@@ -116,6 +117,7 @@ class ConfigFileCreator:
             }
             self._dialog.print_pattern_total(pattern)
             patterns.append(pattern)
+            number_of_patterns += 1
         self._dct['patterns'] = patterns
 
     def set_load_command(self):
@@ -320,7 +322,7 @@ class ConfigFileCreationDialog:
                 print('fail')
         return out
 
-    def ask_patterns_want_add(self):
+    def ask_patterns_want_add(self, number_of_patterns):
         out = None
         while True:
             print('Tell whether to add a pattern')
@@ -332,6 +334,16 @@ class ConfigFileCreationDialog:
                 break
             elif not reply or reply == 'n':
                 print('ok', 'don\'t need pattern')
+                tobe = 'is' if number_of_patterns == 1 else 'are'
+                ending = '' if number_of_patterns == 1 else 's'
+                print(
+                    'there {tobe} {} pattern{ending}'
+                    .format(
+                        number_of_patterns,
+                        tobe=tobe,
+                        ending=ending
+                    )
+                )
                 out = False
                 break
             else:
