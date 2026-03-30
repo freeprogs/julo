@@ -745,6 +745,8 @@ class ConfigFileDisk:
         out = None
         if os.path.exists(filename):
             out = self._dialog.ask_for_rewrite(filename)
+            if out is None:
+                out = self._dialog.ask_for_another_filename()
         else:
             out = filename
         return out
@@ -777,6 +779,35 @@ class ConfigFileDiskDialog:
                 print()
                 out = None
                 break
+        return out
+
+    def ask_for_another_filename(self):
+        out = None
+        n, maxn = 1, 3
+        print(
+            'You may choose another file name {} times'
+            .format(maxn)
+        )
+        while n <= maxn:
+            print('Input another file name, try #{}:'.format(n))
+            print('(input name or leave it empty)')
+            reply = input('> ')
+            if reply:
+                filename = reply
+                if os.path.exists(filename):
+                    print('fail', 'such file exists already')
+                    print()
+                else:
+                    print('ok', 'new name is set')
+                    print()
+                    out = filename
+                    break
+            else:
+                break
+            n += 1
+        if out is None:
+            print('ok', 'no new name')
+            print()
         return out
 
 class ConfigFileHandler:
