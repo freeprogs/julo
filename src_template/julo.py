@@ -742,12 +742,30 @@ class ConfigFileDisk:
         pass
 
     def get_file_name(self, filename):
-        print('get_file_name()', filename)
-        out = filename
+        out = None
+        if os.path.exists(filename):
+            while True:
+                print('You have such file already:', filename)
+                print('Do you want to rewrite it?')
+                print('(input y/n, default: n)')
+                reply = input('> ')
+                if reply == 'y':
+                    print('ok', 'will be rewritten')
+                    print()
+                    out = filename
+                    break
+                else:
+                    print('ok', 'will not change')
+                    print()
+                    out = None
+                    break
+        else:
+            out = filename
         return out
 
     def save(self, filename, text):
-        print('save()', filename, text)
+        with open(filename, 'w', encoding='utf-8') as fout:
+            fout.write(text)
         out = True
         return out
 
