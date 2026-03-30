@@ -739,26 +739,12 @@ class ConfigFileXMLBuilder:
 class ConfigFileDisk:
 
     def __init__(self):
-        pass
+        self._dialog = ConfigFileDiskDialog()
 
     def get_file_name(self, filename):
         out = None
         if os.path.exists(filename):
-            while True:
-                print('You have such file already:', filename)
-                print('Do you want to rewrite it?')
-                print('(input y/n, default: n)')
-                reply = input('> ')
-                if reply == 'y':
-                    print('ok', 'will be rewritten')
-                    print()
-                    out = filename
-                    break
-                else:
-                    print('ok', 'will not change')
-                    print()
-                    out = None
-                    break
+            out = self._dialog.ask_for_rewrite(filename)
         else:
             out = filename
         return out
@@ -767,6 +753,30 @@ class ConfigFileDisk:
         with open(filename, 'w', encoding='utf-8') as fout:
             fout.write(text)
         out = True
+        return out
+
+class ConfigFileDiskDialog:
+
+    def __init__(self):
+        pass
+
+    def ask_for_rewrite(self, filename):
+        out = None
+        while True:
+            print('You have such file already:', filename)
+            print('Do you want to rewrite it?')
+            print('(input y/n, default: n)')
+            reply = input('> ')
+            if reply == 'y':
+                print('ok', 'will be rewritten')
+                print()
+                out = filename
+                break
+            else:
+                print('ok', 'will not change')
+                print()
+                out = None
+                break
         return out
 
 class ConfigFileHandler:
