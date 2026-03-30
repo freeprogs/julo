@@ -169,7 +169,7 @@ class ConfigFileCreator:
         self._xmldoc.compose_parts()
         text = self._xmldoc.result()
         filename = self._disk.get_file_name(self.config_file)
-        if filename:
+        if filename is not None:
             self._disk.save(filename, text)
 
     def end(self):
