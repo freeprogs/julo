@@ -53,6 +53,7 @@ class ConfigFileCreator:
         self._dct = None
         self._dialog = ConfigFileCreationDialog()
         self._xmldoc = ConfigFileXMLBuilder()
+        self._disk = ConfigFileDisk()
 
     def start(self):
         self._dct = {}
@@ -167,8 +168,9 @@ class ConfigFileCreator:
         self._xmldoc.build_footer()
         self._xmldoc.compose_parts()
         text = self._xmldoc.result()
-        with open(self.config_file, 'w', encoding='utf-8') as fout:
-            fout.write(text)
+        filename = self._disk.get_file_name(self.config_file)
+        if filename:
+            self._disk.save(filename, text)
 
     def end(self):
         self._dct = None
@@ -732,6 +734,21 @@ class ConfigFileXMLBuilder:
 
     def result(self):
         out = self._result
+        return out
+
+class ConfigFileDisk:
+
+    def __init__(self):
+        pass
+
+    def get_file_name(self, filename):
+        print('get_file_name()', filename)
+        out = filename
+        return out
+
+    def save(self, filename, text):
+        print('save()', filename, text)
+        out = True
         return out
 
 class ConfigFileHandler:
