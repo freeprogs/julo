@@ -291,11 +291,14 @@ class UrlsFileHandler:
         #получить: возвращается первая строка, начинающаяся
         #          с маркера (маркер удаляется)
         """Найти первую строку, начинающуюся с маркера."""
+        out = None
         marker = self._marker
         with open(self._fname, encoding='utf-8') as fin:
             for line in fin:
                 if line.startswith(marker):
-                    return line[len(marker):].strip()
+                    out = line[len(marker):].strip()
+                    break
+        return out
 
     def get_url(self, string):
         #дано    : строка из файла со ссылками
