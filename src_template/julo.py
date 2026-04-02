@@ -517,6 +517,7 @@ class DownloadHandler:
         self._tmpnameinfo = tmpnameinfo
         self._nxtnameinfo = nxtnameinfo
         self._fxdnameinfo = fxdnameinfo
+        self._complete = None
 
     def start(self):
         #дано    :
