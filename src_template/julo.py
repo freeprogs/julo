@@ -389,6 +389,7 @@ class PageHandler:
         # получить: найдена подстрока после начала поиска,
         #           находящаяся между левым и правым шаблонами
         """Получить строку со страницы, подходящую под заданные шаблоны."""
+        out = None
         startpat = self._startre
         substrpat = '(?P<substr>.+?)'.join(self._substrre)
         searchflag = False
@@ -400,7 +401,9 @@ class PageHandler:
             if searchflag:
                 match = re.search(substrpat, linedec)
                 if match is not None:
-                    return match.group('substr')
+                    out = match.group('substr')
+                    break
+        return out
 
     def end(self):
         #дано    :
