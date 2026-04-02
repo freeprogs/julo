@@ -337,8 +337,8 @@ class UrlsFileHandler:
                 line = line.rstrip()
                 if line.startswith(marker) and \
                    line[len(marker):].startswith(s):
-                   print('{0}{1}'.format(rmarker, line[len(marker):]),
-                         file=fout)
+                    print('{0}{1}'.format(rmarker, line[len(marker):]),
+                          file=fout)
                 else:
                     print(line, file=fout)
         os.remove(fname)
