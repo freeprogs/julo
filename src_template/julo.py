@@ -315,9 +315,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_urls_file_name(self, default):
@@ -336,9 +333,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_urls_file_search(self, default):
@@ -357,9 +351,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_urls_file_replace(self, default):
@@ -378,9 +369,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_urls_file_namesep(self, default):
@@ -399,9 +387,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_notice_messages_name(self, default):
@@ -420,9 +405,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_notice_messages_one(self, default):
@@ -441,9 +423,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_notice_messages_all(self, default):
@@ -462,9 +441,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_patterns_want_add(self, number_of_patterns):
@@ -493,9 +469,6 @@ class ConfigFileCreationDialog:
                 out = False
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_pattern_load(self, default):
@@ -514,9 +487,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_pattern_start(self):
@@ -596,9 +566,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_temp_filenames_prefix(self, default):
@@ -617,9 +584,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_temp_filenames_suffix(self, default):
@@ -638,9 +602,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_temp_filenames_random(self, default):
@@ -659,9 +620,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_final_filenames_prefix(self, default):
@@ -680,9 +638,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
     def ask_final_filenames_suffix(self, default):
@@ -701,9 +656,6 @@ class ConfigFileCreationDialog:
                 print('ok "{}"'.format(reply))
                 print()
                 break
-            else:
-                print('fail')
-                print()
         return out
 
 class ConfigFileXMLBuilder:
