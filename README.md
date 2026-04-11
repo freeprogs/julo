@@ -55,6 +55,12 @@ $ sudo make uninstall
 
 Read examples in __man 5 julo__ .
 
+You can create a new configuration file interactively:
+
+```sh
+$ julo -c julo.xml
+```
+
 ### Run
 
 Make the config file __julo.xml__ in the directory. Make the urls file in the directory. In the urls file mark urls you want to download.
