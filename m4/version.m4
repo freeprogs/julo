@@ -6,9 +6,9 @@ m4_define(__PROGRAM_AUTHOR_EMAIL_RAW__, freeprogs.feedback@yandex.ru)m4_dnl
 m4_define(__PROGRAM_DAY__, 15)m4_dnl
 m4_define(__PROGRAM_MONTH__, Nov)m4_dnl
 m4_define(__PROGRAM_YEAR__, 2012)m4_dnl
-m4_define(__PROGRAM_UPDATE_DAY__, 16)m4_dnl
-m4_define(__PROGRAM_UPDATE_MONTH__, Nov)m4_dnl
-m4_define(__PROGRAM_UPDATE_YEAR__, 2025)m4_dnl
+m4_define(__PROGRAM_UPDATE_DAY__, 11)m4_dnl
+m4_define(__PROGRAM_UPDATE_MONTH__, Apr)m4_dnl
+m4_define(__PROGRAM_UPDATE_YEAR__, 2026)m4_dnl
 m4_define(__PROGRAM_COPYRIGHT__, `Copyright (C) __PROGRAM_YEAR__-__PROGRAM_UPDATE_YEAR__')m4_dnl
 m4_define(__PROGRAM_LICENSE__, GNU GPLv3)m4_dnl
 m4_define(__PROGRAM_VERSION__, m4_regexp(m4_include(VERSION),`.*',`\&'))m4_dnl

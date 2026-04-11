@@ -26,6 +26,7 @@ __PROGRAM_NAME__ \- start from a top url, jump to a direct url and load the file
 .SH SYNOPSIS
 
 .B __PROGRAM_NAME__
+[ \fB-c file\fR ]
 [ \fBconfig\fR ]
 
 .SH DESCRIPTION
@@ -132,10 +133,18 @@ Output files:
 
 With these settings the program will display "Site With Videos" to the user in the console. Then the program will start search in the file "urls.txt" for urls starting from the "*" character. And then the url will be downloaded by the command "curl\ %url" where the page url will be substituted to the "%url" template point and the downloaded resulting page will be searched for the start string "Press download button...". If the start string is found, then the page text after the start string will be searched for the left pattern '<a\ href="' which is starting the target url and '"\ class' for the right pattern which is ending the target url. Then the target url will be found and downloaded by the command "curl %url -o %file" where the target url will be substituted to the "%url" template point and the output file name will be substituted to the "%file" template point. The target file will download to the temporary name "tmp_abcd0102.mp4" and when the download of the target file will be completed the temporary file will be renamed from "tmp_abcd0102.mp4" to "file1.mp4". Then in the "urls.txt" the top url will be marked from "*" character to the "[" character and the notice will be displayed to the user as "SWV: loaded". If no any top urls are marked in the file "urls.txt" for download by the "*" character, then the notice will be displayed to the user as "SWV: complete" also.
 
+.SH OPTIONS
+
+.TP
+
+.B \-c \fI file \fP
+
+Create interactively a new configuration file with a given filename.
+
 .SH "SOME EXAMPLES"
 
-.B
-Example 1
+.SS
+.B Example 1
 
 Download from YouTube configuration:
 
@@ -185,6 +194,7 @@ Output messages:
 
 Here you see how to load videos from YouTube by the program yt-dlp and some tricks within the command line without jumps by patterns for pages. First three videos are saved by the order and the fourth video is saved by the fixed name.
 
+.SS
 .B
 Example 2
 
